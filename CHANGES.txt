@@ -1,0 +1,20 @@
+1.1 (butteredurls fork)
+- modified query calls to use PDO to allow PostgreSQL/SQLite support
+- created an install.php to handle execution of installation queries
+- created statistics table to record IP/referer/timestamp
+- added column to urls table for doing custom urls like /flickr
+- added simple statistics (hits) page in admin area
+
+1.0.2
+- updated existing url query to also compare the url in the event of multiple matching checksums
+- changed UNIQUE checksum index to non-unique INDEX to allow for legitimate collisions
+- added note about .htaccess to README.txt
+- added "Updating from 1.0.1" to README.txt
+- added CHANGES.txt
+
+1.0.1
+- fixed YEAR definition (was 356 days instead of 365)
+- fixed typos in README.txt
+
+1.0
+- initial release
