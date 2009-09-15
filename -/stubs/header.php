@@ -47,6 +47,17 @@ input
 	border: none;
 	padding: 4px;
 }
+span
+{
+	display: block;
+	margin: 16px 0 0;
+	font-size: 9px;
+	color: #999;
+}
+span code
+{
+	font-size: 10px;
+}
 </style>
 </head>
 <body>

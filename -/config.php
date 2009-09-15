@@ -17,3 +17,7 @@ define('DB_DRIVER',		'mysql'); // mysql or pgsql, sqlite could be done with mayb
 define('DB_SERVER', 	'localhost');
 define('DB_PREFIX', 	'bcurls_');
 define('COOKIE_SALT', 	'B75sS4L7T0R3PEPp3R');
+define('API_SALT',		'B75jk4K25M5U7hTAP1');
+
+// URL to hit if someone visits your site without a short url, set to null for just a blank page
+define('HOMEPAGE_URL', 'http://example.com');

@@ -4,7 +4,7 @@ include('config.php');
 include('db.php');
 include('stats.php');
 
-define('BCURLS_VERSION',	'1.1');
+define('BCURLS_VERSION',	'1.1.1');
 
 define('BCURLS_DOMAIN', 	preg_replace('#^www\.#', '', $_SERVER['SERVER_NAME']));
 define('BCURLS_URL', 	str_replace('-/index.php', '', 'http://'.BCURLS_DOMAIN.$_SERVER['PHP_SELF']));
@@ -12,6 +12,9 @@ define('BCURLS_URL', 	str_replace('-/index.php', '', 'http://'.BCURLS_DOMAIN.$_S
 define('COOKIE_NAME', 	DB_PREFIX.'auth');
 define('COOKIE_VALUE',	md5(USERNAME.PASSWORD.COOKIE_SALT));
 define('COOKIE_DOMAIN', '.'.BCURLS_DOMAIN);
+
+if (!defined('API_SALT')) define('API_SALT', 'B75jk4K25M5U7hTAP1'); // added in lessn 1.0.5
+define('API_KEY', md5(USERNAME.PASSWORD.API_SALT));
 
 define('NOW', 		time());
 define('YEAR',		365 * 24 * 60 * 60);
@@ -24,6 +27,15 @@ if (isset($_POST['username']))
 		setcookie(COOKIE_NAME, COOKIE_VALUE, NOW + YEAR, '/', COOKIE_DOMAIN);
 		$_COOKIE[COOKIE_NAME] = COOKIE_VALUE;
 	}
+}
+// API login
+else if (isset($_GET['api']) && $_GET['api'] == API_KEY)
+{
+	$_COOKIE[COOKIE_NAME] = COOKIE_VALUE;
+}
+else if (isset($_GET['api'])) // spit out a nicer failure for API attempts
+{
+	exit('Invalid API key');
 }
 
 // handle logout
@@ -40,8 +52,8 @@ if (!isset($_COOKIE[COOKIE_NAME]) || $_COOKIE[COOKIE_NAME] != COOKIE_VALUE)
 	include('pages/login.php');
 	exit();
 }
-// prolong login for another year
-else
+// prolong login for another year, unless this is an API request
+else if (!isset($_GET['api']))
 {
 	setcookie(COOKIE_NAME, COOKIE_VALUE, NOW + YEAR, '/', COOKIE_DOMAIN);
 }
@@ -53,6 +65,11 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 	if (!preg_match('#^[^:]+://#', $url))
 	{
 		$url = 'http://'.$url;
+	}
+	if(strpos($url, BCURLS_URL) === 0)
+	{
+		include('pages/error.php');
+		exit;
 	}
 	$checksum 		= sprintf('%u', crc32($url));
 	$escaped_url 	= $url;
@@ -86,9 +103,19 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 	
 	if (isset($_GET['tweet']))
 	{
-		header('Location:http://twitter.com/?status='.urlencode($new_url));
+		$_GET['redirect'] = 'http://twitter.com/?status=%l';
+	}
+	if (isset($_GET['redirect']))
+	{
+		header('Location:'.str_replace('%l', urlencode($new_url), $_GET['redirect']));
 		exit();
 	}
+	if (isset($_GET['api']))
+	{
+		echo $new_url;
+		exit();
+	}
+	
 	include('pages/done.php');
 }
 else if(isset($_GET['stats']))

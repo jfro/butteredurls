@@ -35,10 +35,18 @@ if (isset($_GET['token']))
 		}
 	}
 	else if($_GET['token'] == '')
-		exit('<h1>jfro.me</h1>');
+	{
+		if(defined('HOMEPAGE_URL') && HOMEPAGE_URL)
+			header("Location: ".HOMEPAGE_URL);
+		exit;
+	}
 }
 else
-	exit('<h1>jfro.me</h1>');
+{
+	if(defined('HOMEPAGE_URL') && HOMEPAGE_URL)
+		header("Location: ".HOMEPAGE_URL);
+	exit;
+}
 
 // no redirect
 header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');

@@ -5,16 +5,18 @@
 	<input type="text" name="custom_url" value="" placeholder="custom short url" /> (optional)
 	
 	<p>Grab the <a 
-		title="Lessn a link"
+		title="Shrink a link"
 		href="javascript:location.href='<?php echo BCURLS_URL; ?>-/?url='+encodeURIComponent(location.href);" 
 		onclick="alert('Drag this bookmarklet onto your browser bar.');return false;">
 		Shrinkn
 		</a> or <a 
-		title="Lessn and tweet the Lessn'd link"
+		title="Shrink and tweet the shortened link"
 		href="javascript:location.href='<?php echo BCURLS_URL; ?>-/?tweet&amp;url='+encodeURIComponent(location.href);" 
 		onclick="alert('Drag this bookmarklet onto your browser bar.');return false;">
 		Tweetn
-		</a> bookmarklet.</p>
+		</a> bookmarklet.
+		<span>API key: <code><?php echo API_KEY; ?></code></span>
+	</p>
 </form>
 
 <p>

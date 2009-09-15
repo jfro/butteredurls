@@ -1,3 +1,8 @@
+1.1.1
+- Fix for #1
+- Support for api and redirect URL arguments thanks to Lessn 1.0.5
+- Added new configuration option HOMEPAGE_URL for redirecting somewhere if no short url is given
+
 1.1 (butteredurls fork)
 - modified query calls to use PDO to allow PostgreSQL/SQLite support
 - created an install.php to handle execution of installation queries
