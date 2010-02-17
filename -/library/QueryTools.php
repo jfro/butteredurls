@@ -286,6 +286,7 @@ class QueryTools
 				case 'bool':
 					$out = 'tinyint(1)';
 					break;
+				case 'inet':
 				case 'string':
 					if($size === null)
 						$size = 128;
@@ -314,6 +315,9 @@ class QueryTools
 		{
 			switch($type)
 			{
+				case 'inet':
+					$type = 'inet';
+					break;
 				case 'datetime':
 					$type = 'timestamp without time zone';
 					break;
@@ -357,6 +361,7 @@ class QueryTools
 				case 'serial':
 					$out = 'INTEGER';
 					break;
+				case 'inet':
 				case 'string':
 				case 'text':
 				case 'datetime':
