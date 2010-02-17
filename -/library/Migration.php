@@ -1,4 +1,8 @@
 <?php
+// If install.php was deleted, don't allow access!
+defined('OKAY_TO_MIGRATE') OR die('No direct access allowed.'); 
+
+
 abstract class Migration
 {
 	protected $db;
@@ -26,5 +30,5 @@ abstract class Migration
 	{
 		return call_user_func_array(array($this->qt, $method), $args);
 	}
-	
+
 }

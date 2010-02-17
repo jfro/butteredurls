@@ -1,4 +1,8 @@
 <?php
+// If install.php was deleted, don't allow access!
+defined('OKAY_TO_MIGRATE') OR die('No direct access allowed.'); 
+
+
 class CreateURLsTable extends Migration
 {
 	function up()
