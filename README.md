@@ -87,4 +87,4 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 
 <!-- Upgrading to ButteredURLs 2.1+ from ≤ 2.0 should start at install.php?start=4. -->
 
-**Congratulations.** You are running the latest version of Buttered URLs.
+**Congratulations.** You are running the latest version of Lessn More.
