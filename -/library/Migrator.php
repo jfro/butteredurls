@@ -48,7 +48,6 @@ class Migrator
 	
 	function updateInfoToVersion($v)
 	{
-		print 'Updating to v: '.$v.'<br />';
 		$this->db->exec('UPDATE '.DB_PREFIX.'schema_info SET version='.$v.' WHERE id = 1');
 	}
 	
@@ -68,13 +67,11 @@ class Migrator
 			$v = intval(substr($file,0,strpos($file,'_')));
 			if(!class_exists($class))
 			{
-				print 'Failed to find class: '.$class.'<br />';
+				print 'Failed to find class: \''.$class.'\' in migration \''.$file.'\'<br />';
 				exit;
 			}
-			print 'Checking '.$v.' against '.$start.'<br />';
 			if($v < $start)
 			{
-				print 'Skipping '.$file.'<br />';
 				continue;
 			}
 			$m = new $class($this->db);
@@ -87,14 +84,17 @@ class Migrator
 				$this->db->rollBack();
 				throw $e;
 			}
-			print 'Ran '.$v.' migration<br />';
 			$last_version = $v;
 		}
 		if($last_version > $start)
+		{
 			$this->updateInfoToVersion($last_version);
-		$this->db->commit();
+			$this->db->commit();
+			print 'Successfully updated to '.$last_version;
+		}
+		else
+			print 'Already up-to-date';
 		
-		print 'Success';
 	}
 	
 }

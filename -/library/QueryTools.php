@@ -376,7 +376,7 @@ class QueryTools
 				$out .= !$options['null'] ? ' NOT NULL' : '';
 			if(isset($options['default']))
 			{
-				$out .= ' DEFAULT '.$this->qt->nativeValueForType($options['default'], $originalType); //.'::'.$type;
+				$out .= ' DEFAULT '.$this->nativeValueForType($options['default'], $originalType); //.'::'.$type;
 			}
 		}
 		$dec = $this->objectReference($name).' '.$out;
