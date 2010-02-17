@@ -15,7 +15,9 @@ if(strrpos($token, '/stats'))
 if (isset($_GET['token']))
 {
 	// try custom url first
-	$stmt = $db->query('SELECT * FROM '.DB_PREFIX.'urls WHERE custom_url=\''.$_GET['token'].'\' LIMIT 1');
+	$stmt = $db->prepare('SELECT * FROM '.DB_PREFIX.'urls WHERE custom_url=? LIMIT 1');
+	$stmt->bindValue(1, $_GET['token']);
+	$stmt->execute();
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 	if(!$row)
 	{
