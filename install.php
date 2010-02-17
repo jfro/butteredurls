@@ -6,7 +6,7 @@ $sql = array();
 
 //$db_prefix = DB_PREFIX;
 $sql['pgsql'] = array();
-$sql['pgsql'][] = <<<EOT
+$sql['pgsql'][0] = <<<EOT
 CREATE TABLE ${prefix}urls
 (
 	id serial NOT NULL, 
@@ -16,7 +16,7 @@ CREATE TABLE ${prefix}urls
 );
 EOT;
 
-$sql['pgsql'][] = <<<EOT
+$sql['pgsql'][1] = <<<EOT
 CREATE TABLE ${prefix}url_stats
 (
 	id serial NOT NULL, 
@@ -29,18 +29,19 @@ CREATE TABLE ${prefix}url_stats
 );
 EOT;
 
-$sql['pgsql'][] = <<<EOT
+$sql['pgsql'][2] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
 EOT;
 
-$sql['pgsql'][] = <<<EOT
+$sql['pgsql'][3] = <<<EOT
 CREATE TYPE bu_redir_type AS ENUM ('auto', 'custom', 'alias', 'gone');
 ALTER TABLE ${prefix}urls ADD COLUMN redir_type bu_redir_type DEFAULT 'auto';
+UPDATE ${prefix}urls SET redir_type = 'custom' WHERE custom_url IS NOT NULL;
 EOT;
 
 // MySQL
 $sql['mysql'] = array();
-$sql['mysql'][] = <<<EOT
+$sql['mysql'][0] = <<<EOT
 CREATE TABLE ${prefix}urls(
 id int(11) unsigned NOT NULL auto_increment,
 url text character set utf8 collate utf8_unicode_ci NOT NULL,
@@ -50,7 +51,7 @@ KEY checksum (checksum)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT;
 
-$sql['mysql'][] = <<<EOT
+$sql['mysql'][1] = <<<EOT
 CREATE TABLE `${prefix}url_stats` (
 `id` int(11) unsigned NOT NULL auto_increment, 
 `url_id` int(11) NOT NULL,
@@ -62,12 +63,13 @@ INDEX `url_id` (`url_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT;
 
-$sql['mysql'][] = <<<EOT
+$sql['mysql'][2] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
 EOT;
 
-$sql['mysql'][] = <<<EOT
+$sql['mysql'][3] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN redir_type ENUM ('auto', 'custom', 'alias', 'gone') DEFAULT 'auto';
+UPDATE ${prefix}urls SET redir_type = 'custom' WHERE custom_url IS NOT NULL;
 EOT;
 
 if(!array_key_exists(DB_DRIVER, $sql))
@@ -90,17 +92,19 @@ echo "<!DOCTYPE HTML>
 	<div class=\"everythingElse\">
 ";
 
-if(isset($_GET['start']))
+$offset = 0;
+if(isset($_GET['start']) AND ctype_digit($_GET['start']))
 {
-	$queries = array_slice($queries, $_GET['start']);
-	echo '<p>Starting from query #'.$_GET['start'].'</p>';
+	$offset = (int) $_GET['start'];
+	$queries = array_slice($queries, $offset);
+	echo '<p>Starting from internal query #'.$offset.'</p>';
 }
 
 echo '<dl>';
 
 foreach($queries as $num => $q) {
-	
-	$progress = 'Step '.($num+1).' / '.count($queries);
+	$internal = $offset+$num;
+	$progress = 'Step '.($num+1).' / '.count($queries)." (Internal query #$internal)";
 	echo "\n<dt>$progress</dt>\n\t";
 	
 	try {
@@ -109,13 +113,20 @@ foreach($queries as $num => $q) {
 		// $stmt->execute();
 		$db->exec($q);
 		echo '<dd>Sucesss</dd>';
+		if ($internal == 3)
+		{
+			echo '<dd><strong>Important!</strong> Please be sure to run '
+				.'<a href="/migrate.php?migration=explicit-urls">migrate.php?migration=explicit-urls</a>'
+				.' as this upgrade has changed the way short URLs are stored!'
+				.'</dd>';
+		}
 	}
 	catch (Exception $e)
 	{
 		echo '<dd>Exception occurred (this is normal if you are upgrading ',
 			'and did not set the "start" GET variable and if this is not the ',
 			'last step.) <br />Message: ',
-			htmlentities($e->getMessage()).'</dd>';
+			nl2br(htmlentities($e->getMessage())).'</dd>';
 	}
 }
 print '</dl><p><strong>Done, delete install.php</strong></p></div></body></html>';

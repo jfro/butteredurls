@@ -1,5 +1,13 @@
 <?php
 
+/**
+*	
+*	TODO: Handle updating edge cases with a log function so we don't guess forever.
+*	1,2,4,8...
+*
+*	TODO: Never just insert an ID
+*	
+*/
 include('config.php');
 include('db.php');
 include('stats.php');
