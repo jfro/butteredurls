@@ -80,14 +80,14 @@ $queries = $sql[DB_DRIVER];
 echo "<!DOCTYPE HTML>
 <html>
 <head>
-<title>Installing or Upgrading Buttered URLs</title>
+<title>Installing or Upgrading ".APP_NAME."</title>
 <link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/reset.css\"/>
 <link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/standalonepage.css\"/>
 </head>
 <body>
 	<div class=\"bigWrap\">
 		<div class=\"huge\">+</div>
-		<h2 class=\"bigTitle\">Installing/Upgrading Buttered URLs</h2>
+		<h2 class=\"bigTitle\">Installing/Upgrading ".APP_NAME."</h2>
 	</div>
 	<div class=\"everythingElse\">
 ";

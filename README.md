@@ -1,4 +1,4 @@
-Buttered URLs
+Lessn More
 =============
 
 Lessn is an extremely simple, personal url shortener 
@@ -79,9 +79,8 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 	decisions about.
 1.	Upload all lessn/BU files, excluding config.php, or making sure to use the new one.
 1.  Go to http://doma.in/x/install.php?start=N where N 
-	is 1 for if upgrading from Lessn,  
-	2 if upgrading from an old version of Buttered URLs with logging but no custom URLs (slugs), or  
-	3 if upgrading from Buttered URLs < v. 2.0.
+	is 1 if upgrading from Lessn 1.0,  
+	or 3 if upgrading from Buttered URLs 1.1 (this is more likely).
 1.	Go to http://doma.in/x/migrate.php?migration=explicit-slugs
 1.	Test some old known working redirections
 1.	Delete install.php and migrate.php.

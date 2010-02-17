@@ -6,14 +6,14 @@ $prefix = DB_PREFIX;
 echo "<!DOCTYPE HTML>
 <html>
 <head>
-<title>Buttered URLs Migration</title>
+<title>".APP_NAME." Migration</title>
 <link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/reset.css\"/>
 <link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/standalonepage.css\"/>
 </head>
 <body>
 	<div class=\"bigWrap\">
 		<div class=\"huge\">&#8635;</div>
-		<h2 class=\"bigTitle\">Buttered URLs Migration</h2>
+		<h2 class=\"bigTitle\">".APP_NAME." Migration</h2>
 	</div>
 	<div class=\"everythingElse\">
 ";

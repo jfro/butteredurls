@@ -44,5 +44,9 @@ define('ALLOW_HOMOGLYPHS_IN_CUSTOM_URLS', TRUE);
 
 // URL to hit if someone visits your site without a short url, set to null for just a blank page
 define('HOMEPAGE_URL', NULL); //e.g. 'http://example.com'
+// If an slug is not found occurns, e.g. http://doma.in/this-slug-doesn't-exist
+define('ERROR_404_URL', NULL); //e.g. 'http://example.com/404'
+// If an slug was deleted (marked 'gone')
+define('GONE_410_URL', NULL); //e.g. 'http://example.com/gone'
 
 define('APP_NAME', 'Lessn More');
