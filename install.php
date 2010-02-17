@@ -4,7 +4,9 @@ include('-/db.php');
 $prefix = DB_PREFIX;
 $sql = array();
 
-//$db_prefix = DB_PREFIX;
+// ---------
+// PostgreSQL
+// ---------
 $sql['pgsql'] = array();
 $sql['pgsql'][] = <<<EOT
 CREATE TABLE ${prefix}urls
@@ -33,7 +35,9 @@ $sql['pgsql'][] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
 EOT;
 
+// ---------
 // MySQL
+// ---------
 $sql['mysql'] = array();
 $sql['mysql'][] = <<<EOT
 CREATE TABLE ${prefix}urls(
