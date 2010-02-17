@@ -67,23 +67,55 @@ ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
 EOT;
 
 $sql['mysql'][] = <<<EOT
-ALTER TABLE ${prefix}urls ADD COLUMN redir_type NUM ('auto', 'custom', 'alias', 'gone') DEFAULT 'auto';
+ALTER TABLE ${prefix}urls ADD COLUMN redir_type ENUM ('auto', 'custom', 'alias', 'gone') DEFAULT 'auto';
 EOT;
 
 if(!array_key_exists(DB_DRIVER, $sql))
 	die('Unknown database driver, no installation SQL found');
 	
 $queries = $sql[DB_DRIVER];
+
+echo "<!DOCTYPE HTML>
+<html>
+<head>
+<title>Installing or Upgrading Buttered URLs</title>
+<link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/reset.css\"/>
+<link type=\"text/css\" rel=\"stylesheet\" href=\"http://pan.alanhogan.com/css/standalonepage.css\"/>
+</head>
+<body>
+	<div class=\"bigWrap\">
+		<div class=\"huge\">+</div>
+		<h2 class=\"bigTitle\">Installing/Upgrading Buttered URLs</h2>
+	</div>
+	<div class=\"everythingElse\">
+";
+
 if(isset($_GET['start']))
 {
 	$queries = array_slice($queries, $_GET['start']);
-	print 'Starting from query #'.$_GET['start'].'<br />';
+	echo '<p>Starting from query #'.$_GET['start'].'</p>';
 }
 
-foreach($queries as $q) {
-	//$q = str_replace("\n", "", $q);
-	// $stmt = $db->prepare($q);
-	// $stmt->execute();
-	$db->exec($q);
+echo '<dl>';
+
+foreach($queries as $num => $q) {
+	
+	$progress = 'Step '.($num+1).' / '.count($queries);
+	echo "\n<dt>$progress</dt>\n\t";
+	
+	try {
+		//$q = str_replace("\n", "", $q);
+		// $stmt = $db->prepare($q);
+		// $stmt->execute();
+		$db->exec($q);
+		echo '<dd>Sucesss</dd>';
+	}
+	catch (Exception $e)
+	{
+		echo '<dd>Exception occurred (this is normal if you are upgrading ',
+			'and did not set the "start" GET variable and if this is not the ',
+			'last step.) <br />Message: ',
+			htmlentities($e->getMessage()).'</dd>';
+	}
 }
-print 'Done, delete install.php';
+print '</dl><p><strong>Done, delete install.php</strong></p></div></body></html>';
