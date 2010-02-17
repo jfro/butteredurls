@@ -277,6 +277,9 @@ class QueryTools
 		{
 			switch($type)
 			{
+				case 'bigint':
+					$type = 'bigint';
+					break;
 				case 'datetime':
 					$out = 'DATETIME';
 					break;
@@ -306,6 +309,8 @@ class QueryTools
 				default:
 					throw new Exception('Unknown type: '.$type);
 			}
+			if(isset($options['unsigned']) && $options['unsigned'])
+				$out .= ' UNSIGNED';
 			if(isset($options['null']))
 				$out .= !$options['null'] ? ' NOT NULL' : '';
 			if(isset($options['default']))
@@ -315,6 +320,9 @@ class QueryTools
 		{
 			switch($type)
 			{
+				case 'bigint':
+					$type = 'bigint';
+					break;
 				case 'inet':
 					$type = 'inet';
 					break;
@@ -367,6 +375,7 @@ class QueryTools
 				case 'datetime':
 					$out = 'TEXT';
 					break;
+				case 'bigint':
 				case 'integer':
 				case 'bool':
 					$out = 'INTEGER';

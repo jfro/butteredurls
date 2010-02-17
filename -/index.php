@@ -68,15 +68,15 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 	}
 	if(strpos($url, BCURLS_URL) === 0)
 	{
+		$error = 'You tried to shorten a URL on this domain which should already be short!';
 		include('pages/error.php');
 		exit;
 	}
 	$checksum 		= sprintf('%u', crc32($url));
-	$escaped_url 	= $url;
+	//$escaped_url 	= $url;
 	$result = $db->prepare('SELECT id FROM '.DB_PREFIX.'urls WHERE checksum=? AND url=? LIMIT 1');
 	$result->bindValue(1, (int)$checksum);
-	$result->bindValue(2, $escaped_url);
-	$result->execute();
+	$result->bindValue(2, $url);
 	if ($result->execute())
 	{
 		
@@ -88,11 +88,27 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		// create
 		else
 		{
-			if($_GET['custom_url'])
-				$custom_url = "'".$_GET['custom_url']."'";
+			if(isset($_GET['custom_url']) && $_GET['custom_url'])
+			{
+				$custom_url = $_GET['custom_url'];
+				// check if it exists
+				$stmt = $db->prepare('SELECT * FROM '.DB_PREFIX.'urls WHERE custom_url = ?');
+				$stmt->bindValue(1, $custom_url);
+				$stmt->execute();
+				if($row = $stmt->fetch(PDO::FETCH_ASSOC))
+				{
+					$error = 'You already have a URL with that custom URL: '.$row['url'];
+					include('pages/error.php');
+					exit;
+				}
+			}
 			else
 				$custom_url = "NULL";
-			$db->query('INSERT INTO '.DB_PREFIX.'urls (url, checksum, custom_url) VALUES(\''.$escaped_url.'\', '.$checksum.', '.$custom_url.')');
+			$stmt = $db->prepare('INSERT INTO '.DB_PREFIX.'urls (url, checksum, custom_url) VALUES(?, ?, ?)');
+			$stmt->bindValue(1, $url);
+			$stmt->bindValue(2, $checksum);
+			$stmt->bindValue(3, $custom_url);
+			$stmt->execute();
 			$id = $db->lastInsertId(DB_PREFIX."urls_id_seq");
 		}
 	}
