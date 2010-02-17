@@ -81,7 +81,7 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 	decisions about.
 1.	Upload all lessn/BU files, excluding config.php, or making sure to use the new one.
 1.	Go to http://doma.in/x/install.php?start=N where 
-	N is 2 if upgrading from Lessen 1.0,or    
+	N is 2 if upgrading from Lessen 1.0, or    
 	N is 4 if upgrading from ButteredURLs 1.1.
 1.	Test some old known working redirections
 1.	Delete install.php.

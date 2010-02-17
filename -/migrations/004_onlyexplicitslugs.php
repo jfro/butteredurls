@@ -35,7 +35,7 @@ class OnlyExplicitSlugs extends Migration
 		//Set up
 		$batch = 10;
 		$prefix = DB_PREFIX;
-		$prelim_sql = "UPDATE ${prefix}urls SET redir_type = 'custom' WHERE custom_url IS NOT NULL"
+		$prelim_sql = "UPDATE ${prefix}urls SET redir_type = 'custom' WHERE custom_url IS NOT NULL";
 		$select_sql = "SELECT * FROM ${prefix}urls "
 			.'WHERE custom_url IS NULL '
 			.'AND id > :custom_url'
