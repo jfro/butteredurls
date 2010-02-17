@@ -33,6 +33,11 @@ $sql['pgsql'][] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
 EOT;
 
+$sql['pgsql'][] = <<<EOT
+CREATE TYPE bu_redir_type AS ENUM ('auto', 'custom', 'alias', 'gone');
+ALTER TABLE ${prefix}urls ADD COLUMN redir_type bu_redir_type DEFAULT 'auto';
+EOT;
+
 // MySQL
 $sql['mysql'] = array();
 $sql['mysql'][] = <<<EOT
@@ -59,6 +64,10 @@ EOT;
 
 $sql['mysql'][] = <<<EOT
 ALTER TABLE ${prefix}urls ADD COLUMN custom_url varchar(255) DEFAULT NULL;
+EOT;
+
+$sql['mysql'][] = <<<EOT
+ALTER TABLE ${prefix}urls ADD COLUMN redir_type NUM ('auto', 'custom', 'alias', 'gone') DEFAULT 'auto';
 EOT;
 
 if(!array_key_exists(DB_DRIVER, $sql))
