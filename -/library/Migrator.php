@@ -63,7 +63,7 @@ class Migrator
 		$files = glob($this->migrations_dir."/*.php");
 		
 		$this->db->beginTransaction();
-		$last_version = 0;
+		$highest_version_seen = 0;
 		echo '<dl>';
 		foreach($files as $file)
 		{
@@ -71,6 +71,7 @@ class Migrator
 			$file = basename($file, '.php');
 			$class = substr($file, strpos($file,'_')+1);
 			$v = intval(substr($file,0,strpos($file,'_')));
+			if($highest_version_seen < $v) $highest_version_seen = $v;
 			if(!class_exists($class))
 			{
 				echo '</dl>';
@@ -107,6 +108,9 @@ class Migrator
 		}
 		echo '</dl>';
 		
+		if($this->currentVersion() == $highest_version_seen){
+			Migrator::message('inform', 'Your schema is up-to-date!');
+		}
 	}
 	
 	
