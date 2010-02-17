@@ -109,7 +109,8 @@ class Migrator
 		echo '</dl>';
 		
 		if($this->currentVersion() == $highest_version_seen){
-			Migrator::message('inform', 'Your schema is up-to-date!');
+			Migrator::message('inform', 'Your schema is up-to-date! Version: '
+				.$this->currentVersion());
 		}
 		
 		$this->html_end();
