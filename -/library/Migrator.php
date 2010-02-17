@@ -70,7 +70,7 @@ class Migrator
 				print 'Failed to find class: \''.$class.'\' in migration \''.$file.'\'<br />';
 				exit;
 			}
-			if($v < $start)
+			if($v < $start || $v <= $this->currentVersion())
 			{
 				continue;
 			}
@@ -90,10 +90,10 @@ class Migrator
 		{
 			$this->updateInfoToVersion($last_version);
 			$this->db->commit();
-			print 'Successfully updated to '.$last_version;
+			print 'Successfully updated to '.$last_version.'<br />';
 		}
 		else
-			print 'Already up-to-date';
+			print 'Already up-to-date<br />';
 		
 	}
 	
