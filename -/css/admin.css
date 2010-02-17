@@ -1,0 +1,267 @@
+/**
+http://pan.alanhogan.com/css/reset.css
+**/
+body, html 
+{
+	background: white none;
+	color: black;
+	padding: 0;
+}
+body, div, p, h1, h2, h3, h4, h5, h6, li, ol, ul, 
+dl, dd, dt, blockquote, form
+{
+	margin: 0;
+	padding: 0;
+}
+ul, ol {
+	padding-left: 2.5em;
+}
+dd {
+	padding-left: 1.5em;
+}
+dt{
+	font-weight:bold;
+}
+input, textarea {
+	font-family: inherit; 
+	font-size: 100%;
+}
+
+dfn, em, cite, var {
+  font-style: italic;
+}
+
+/*HoganSystem-type generic stuff datsgood and classes and such*/
+.code, code, kbd, tt, samp, pre, output	{
+	font-family: "Bitstream Vera Sans Mono", "Andale Mono", Monaco,
+	 "Lucida Console", "anything but ugly courier", monospace;
+}
+/* Fix IE/Win code size bug -waffle.wootest.net */
+* html code	{
+	font-size : 105%; 
+}
+div.code 
+{
+	color: black;
+	border: .1px solid #333;
+	padding: 1em;
+	background: #e9e9e9 none;
+	margin: .5em;
+}
+.finePrint{
+  font-size: 85%;
+  line-height: 108%;
+}
+/***USEFUL DEFAULTS*
+(Headings: We suggest you do not override
+the text-align on h1 and h1.title independently.)
+h1=main title
+h1.subtitle = optional subtitle (right under main title)
+h2...h6: section headings
+SS equivalent of <center>: <tag class="center"> */
+h1,h1.subtitle, 
+.center {text-align:center;}
+
+h1 { font-size: 160%; }
+h1.subtitle, h2 { font-size: 140%;}
+h3 {font-size: 130%;}
+h4 {font-size: 120%; font-style: italic;}
+h5 {font-size: 110%; text-transform: uppercase}
+h6 {font-size: 100%;}
+
+.left { text-align: left; }
+.right { text-align: right; }
+/***Links*/
+a:link, a:visited { text-decoration: underline; } 
+a img { border-width: 0; }
+
+
+/***Floats*/
+.floatLeft, .colorfulFloatLeft {
+ float: left; 
+ clear: left; 
+ margin-right: .5em; 
+}
+.floatRight, .colorfulFloatRight {
+ float: right; 
+ clear: right; 
+ margin-left: .5em; 
+}
+
+
+/***"BAD" things: Errors, alerts...*/
+#errors {
+  color:#c00;
+  background-color:white;
+  border: .1em solid #c00;
+}
+.critical { /* error messages, warnings - red border */
+  border: .1em solid rgb(255, 0, 0);
+  padding: .4em;
+  color: black;
+  background-color: rgb(255, 221, 221);
+}
+.important { /* simply for attention - e.g. the Next Meeting head on the home page*/
+  color: #c11;
+  background-color:white;
+}
+
+/*Hiding stuff*/
+.hidden, .hide, .displayNone, .display-none 
+{
+	display: none;
+}
+
+/**
+http://pan.alanhogan.com/css/standalonepage.css
+**/
+html { min-width: 100%; padding: 0; margin: 0;}
+body {
+    margin: 5px 25px;
+    font-size: .9em; 
+	margin-left: auto;
+	margin-right: auto;
+	width: 44em;
+	overflow: visible;
+}
+.bigWrap {
+  display: block;
+  margin: 40px 20px 0 0;
+  font-size: 100%;
+  text-align: left;
+}
+.huge, .bigTitle {
+}
+.huge, .hugeAuto {  
+  font-size: 8em;
+  color: #668fdd;
+  display: block;
+  float: left;
+  margin-right: 0;
+  margin-left: -100px;
+  position: relative;
+  bottom: .29em;
+  width: 200px;
+  text-align: right;
+  overflow: visible;
+  font-family: "Trebuchet MS", Garamond, Arial, serif;
+}
+.bigWrap .hugeAuto::before{ content:"\00BB";}
+
+.bigTitle {  
+  font-size: 350%;
+  color: #0f3e90;
+  font-family: "Galliard BT", Galliard, "Book Antiqua", "Bookman Old Style", Garamond, Georgia, serif;
+  text-transform: lowercase;
+  display: inline;
+  text-align: left;
+}
+
+.everythingElse {
+  font-family:  Arial, sans-serif;
+  color: #333;
+  border-bottom: 1px solid #0f3e90;
+  padding-top: .4em;
+  padding-bottom: 3px;
+  line-height: 150%;
+  margin-left: 100px;
+  max-width: 31.5em;
+}
+* html .everythingElse {
+  width: 31.5em;
+}
+p {
+  margin-bottom: 1.5em;
+}
+
+em, label, strong {
+	color: black;
+}
+em, strong {
+	font-style: normal;
+	font-weight: bold;
+}
+
+a:link {color: #0f3e90;}
+a:visited {color: #6f1e84} 
+a:link:hover {color: #1f52aa;}
+a:visited:hover {color: #7f2b99} 
+* html a:hover {color: #1f52aa;}
+
+.coolBtn, .coolBtn:link, .coolBtn:link:visited, .coolBtn:visited, #coolSearchBtn
+{
+	color: white !important;
+	background: #1f52aa none;
+	border: 1px solid #0f3e90;;
+	border-top-color: #668fdd;
+	border-left-color: #668fdd;
+	text-decoration: none;
+	padding: 1px 2px 0px 3px;
+	position: relative;
+}
+.coolBtn:hover , #coolSearchBtn:hover
+{
+	background: #2f67bf none;
+	border-top-color: #739ff0;
+	border-left-color: #739ff0;
+	border-right-color: #0f3e90; /*#668fdd;*/
+	border-bottom-color: #0f3e90; /*#668fdd;*/
+	padding: 0px 3px 1px 2px;
+	bottom: 1px;
+}
+.coolBtn:active, #coolSearchBtn:active
+{
+	background: #2f67bf none;
+	border-top-color: #0f3e90;
+	border-left-color: #0f3e90;
+	border-right-color: #668fdd;
+	border-bottom-color: #668fdd;
+	padding: 1px 2px 0px 3px;
+	bottom:0;
+}
+
+/*Go.php/redirect.php*/
+#newLocation, #newLocation a:link, #newLocation a:visited {
+  font-weight: bold;
+}
+
+/**
+Migration messages
+**/
+.message_failure {
+	color: #900;
+}
+.message_failure .message_label {
+	font-weight: bold;
+	display: none;
+}
+.message_failure::before,
+.message_failure:before {
+	content: "\2717\A0"; /* ✗ */
+	color: #c00;
+}
+
+.message_success {
+	color: #090;
+}
+.message_success .message_label {
+	font-weight: bold;
+	display: none;
+}
+.message_success::before,
+.message_success:before {
+	content: "\2713\A0"; /* ✓ */
+	color: #0a0;
+}
+
+.message_inform {
+	color: #358;
+}
+.message_inform .message_label {
+	display: none;
+}
+.message_inform::before,
+.message_inform:before {
+	content: "\24D8\A0"; /*(i)*/
+	color: #17a;
+}
