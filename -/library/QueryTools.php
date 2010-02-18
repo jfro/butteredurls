@@ -278,7 +278,7 @@ class QueryTools
 			switch($type)
 			{
 				case 'bigint':
-					$type = 'bigint';
+					$out = 'bigint';
 					break;
 				case 'datetime':
 					$out = 'DATETIME';
