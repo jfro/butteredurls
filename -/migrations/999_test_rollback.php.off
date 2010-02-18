@@ -1,0 +1,45 @@
+<?php
+// If install.php was deleted, don't allow access!
+defined('OKAY_TO_MIGRATE') OR die('No direct access allowed.'); 
+
+
+class Test_Rollback extends Migration
+{
+	function up()
+	{
+
+		if( ! isset($_GET['debug']))
+		{
+			Migrator::message('inform',
+		 		'This migration tests rollbacks. However you have to run it with '
+				.'the "debug" get variable (<a href="?debug">install.php?debug</a>).'
+				."\nPlease also note that MySQL will "
+				.'<a href="http://www.php.net/manual/en/pdo.rollback.php>always fail</a> rolling back '
+				.'queries that affect the schema (as does this.)',
+				FALSE, TRUE
+			);
+		}
+		else
+		{
+			Migrator::message('inform',
+			 	'This migration always fails. However if you see a column in '
+				.'your schema_info table named rollback_failed, then rollbacks do not work.'
+			);
+
+			$this->addColumn(
+				DB_PREFIX.'schema_info', 
+				'rollback_failed', 
+				'string', 
+				array('default' => 'error', 'size' => 6, 'null' => false)
+			);
+
+		}
+		throw new Exception('Failed on purpose.');
+
+	}
+	
+	function down()
+	{
+		$this->removeColumn(DB_PREFIX.'urls', 'redir_type');
+	}
+}

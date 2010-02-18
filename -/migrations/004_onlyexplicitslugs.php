@@ -7,8 +7,10 @@ class OnlyExplicitSlugs extends Migration
 {
 	function up()
 	{
-
-		
+	}
+	function up2()
+	{
+	
 		// Postgres:
 		// CREATE TYPE bu_redir_type AS ENUM ('auto', 'custom', 'alias', 'gone');
 		// ALTER TABLE ${prefix}urls ADD COLUMN redir_type bu_redir_type DEFAULT 'auto';
@@ -22,6 +24,13 @@ class OnlyExplicitSlugs extends Migration
 		 	'This migration will attempt to assign each non-custom/legacy redirection an '
 			.'explicit slug (short URL path) equal '
 			.'to its id in base 36 (as in the original Lessn).'
+		);
+
+		$this->addColumn(
+			DB_PREFIX.'urls', 
+			'error_occurred', 
+			'string', 
+			array('default' => 'auto', 'size' => 6, 'null' => false)
 		);
 		throw new Exception('Not Implemented');
 

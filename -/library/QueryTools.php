@@ -6,7 +6,7 @@ class QueryTools_Table
 	protected $fields = array();
 	protected $constraints = array();
 	
-	function __construct($qt, $name)
+	function __construct(&$qt, $name)
 	{
 		$this->qt = $qt;
 		$this->name = $name;
@@ -86,7 +86,7 @@ class QueryTools
 	protected $type = null;
 	protected $db = null;
 
-	function __construct($db, $dbType=null)
+	function __construct(&$db, $dbType=null)
 	{
 		$this->db = $db;
 		if($dbType === null)

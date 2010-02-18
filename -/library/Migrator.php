@@ -10,7 +10,7 @@ class Migrator
 	protected $current_version; // checked by constructor
 	protected $migrations_dir;
 	
-	function __construct($db, $migrations_dir=null)
+	function __construct(&$db, $migrations_dir=null)
 	{
 		$this->db = $db;
 		$this->current_version = 0;
@@ -97,9 +97,8 @@ class Migrator
 			}
 			catch(Exception $e)
 			{
-				Migrator::message('failure', 'Failed to migrate, rolling back');
+				Migrator::message('failure', 'Failed to migrate, rolling back.'."\n".(string)$e);
 				$this->db->rollBack();
-				Migrator::message('failure', 'Exception: '.$e);
 				echo '</dd></dl>';
 				$this->html_end();
 				exit();
