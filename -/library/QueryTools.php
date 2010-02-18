@@ -47,54 +47,12 @@ class QueryTools_Table
 		$this->constraints[] = $out;
 	}	
 	
-	function addIndex($fields, $name=null)
-	{
-		$out = null;
-		if($name === null)
-			$name = $this->name.'_indx';
-		
-		if(is_array($fields))
-		{
-			$out = '';
-			foreach($fields as $field)
-			{
-				if($out != '')
-					$out .= ', ';
-				$out .= $this->qt->objectReference($field);
-			}
-			$fields = $out;
-		}
-		else
-			$fields = $this->qt->objectReference($fields);
-			
-		if($this->qt->isType('mysql'))
-		{
-			$out = 'ADD INDEX '.$name.' ('.$fields.')';
-		}
-		else if($this->qt->isType('pgsql'))
-		{
-			// TODO INDEX
-			// See http://www.postgresql.org/docs/7.4/interactive/indexes.html
-			// Needs to be a separate query :(
-			//$out = 'CONSTRAINT '.$name.' INDEX ('.$fields.')';
-		}
-		else if($this->qt->isType('sqlite'))
-		{
-			// TODO INDEX
-			// $out = 'CONSTRAINT '.$name.' INDEX ('.$fields.')';
-		}
-		if (strlen($out))
-			$this->constraints[] = $out;
-	}
 	
 	function column($name, $type, $options=null)
 	{
 		if(isset($options['primary_key']) && $options['primary_key'])
 			$this->addPrimaryKey($name);
 		unset($options['primary_key']);
-		if(isset($options['index']) && $options['index'])
-			$this->addIndex($name);
-		unset($options['index']);
 		$dec = $this->qt->columnDefinition($name, $type, $options);
 		$this->fields[] = $dec;
 	}
