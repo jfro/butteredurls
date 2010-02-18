@@ -7,7 +7,7 @@ abstract class Migration
 {
 	protected $db;
 	
-	function __construct($db)
+	function __construct(&$db)
 	{
 		$this->db = $db;
 		$this->qt = new QueryTools($this->db, $this->db->getAttribute(PDO::ATTR_DRIVER_NAME));

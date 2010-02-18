@@ -17,5 +17,5 @@ else
 	$start = NULL;
 	
 $migrator = new Migrator($db, dirname(__FILE__).'/-/migrations');
-$migrator->migrate(NULL);
+$migrator->migrate($start);
 
