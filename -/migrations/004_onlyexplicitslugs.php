@@ -7,9 +7,13 @@ class OnlyExplicitSlugs extends Migration
 {
 	function up()
 	{
-	}
-	function up2()
-	{
+		$this->addColumn(
+			DB_PREFIX.'urls', 
+			'redir_type', 
+			'string', 
+			array('default' => 'auto', 'size' => 6, 'null' => false)
+		);
+		// We'd like to use an enum, but this is not supported by SQLite. Will use a varchar(6).
 	
 		// Postgres:
 		// CREATE TYPE bu_redir_type AS ENUM ('auto', 'custom', 'alias', 'gone');
@@ -26,21 +30,8 @@ class OnlyExplicitSlugs extends Migration
 			.'to its id in base 36 (as in the original Lessn).'
 		);
 
-		$this->addColumn(
-			DB_PREFIX.'urls', 
-			'error_occurred', 
-			'string', 
-			array('default' => 'auto', 'size' => 6, 'null' => false)
-		);
 		throw new Exception('Not Implemented');
 
-		$this->addColumn(
-			DB_PREFIX.'urls', 
-			'redir_type', 
-			'string', 
-			array('default' => 'auto', 'size' => 6, 'null' => false)
-		);
-		// We'd like to use an enum, but this is not supported by SQLite. Will use a varchar(6).
 		//Set up
 		$batch = 10;
 		$prefix = DB_PREFIX;
