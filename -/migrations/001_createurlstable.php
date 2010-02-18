@@ -12,6 +12,8 @@ class CreateURLsTable extends Migration
 		$t->column('url', 'text', array('null' => false));
 		$t->column('checksum', 'bigint', array('null' => false, 'unsigned' => true));
 		$t->save();
+		
+		$this->createIndex(DB_PREFIX.'urls', 'checksum', 'checksum_index');
 	}
 	
 	function down()
