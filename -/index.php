@@ -112,7 +112,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			$id = $db->lastInsertId(DB_PREFIX."urls_id_seq");
 		}
 	}
-	if($_GET['custom_url'])
+	if(isset($_GET['custom_url']) && $_GET['custom_url'])
 		$new_url = BCURLS_URL.$_GET['custom_url'];
 	else
 		$new_url = BCURLS_URL.base_convert($id, 10, 36);
