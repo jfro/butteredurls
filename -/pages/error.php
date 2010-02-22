@@ -1,7 +1,7 @@
 <?php include('stubs/header.php'); ?>
 <h1>Error</h1>
 <p>
-	<?php echo $error ?>
+	<?php echo htmlentities($error) ?>
 </p>
 <p>
 	<a href="/-/">Back</a>
