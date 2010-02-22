@@ -17,7 +17,8 @@ define('BCURLS_VERSION',	'1.1.1');
 define('BCURLS_DOMAIN', 	preg_replace('#^www\.#', '', $_SERVER['SERVER_NAME']));
 define('BCURLS_URL', 	str_replace('-/index.php', '', 'http://'.BCURLS_DOMAIN.$_SERVER['PHP_SELF']));
 
-define('COOKIE_NAME', 	DB_PREFIX.'auth');
+//don't reveal db prefix over HTTP. 16 chars is more than enough to avoid collisions
+define('COOKIE_NAME', 	substr(md5(DB_PREFIX.COOKIE_SALT), 0, 16).'auth'); 
 define('COOKIE_VALUE',	md5(USERNAME.PASSWORD.COOKIE_SALT));
 define('COOKIE_DOMAIN', '.'.BCURLS_DOMAIN);
 
