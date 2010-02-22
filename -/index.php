@@ -28,6 +28,10 @@ define('API_KEY', md5(USERNAME.PASSWORD.API_SALT));
 define('NOW', 		time());
 define('YEAR',		365 * 24 * 60 * 60);
 
+function bcurls_find_banned_glyphs($slug) {
+	return FALSE;
+}
+
 // handle login
 if (isset($_POST['username']))
 {
@@ -71,6 +75,7 @@ else if (!isset($_GET['api']))
 if (isset($_GET['url']) && !empty($_GET['url']))
 {
 	$url = $_GET['url'];
+	$slug = NULL;
 	if (!preg_match('#^[^:]+://#', $url))
 	{
 		$url = 'http://'.$url;
@@ -81,9 +86,9 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		include('pages/error.php');
 		exit;
 	}
+	// Is there already a row in the DB going to this same URL?
 	$checksum 		= sprintf('%u', crc32($url));
-	//$escaped_url 	= $url;
-	$result = $db->prepare('SELECT id FROM '.DB_PREFIX.'urls WHERE checksum=? AND url=? LIMIT 1');
+	$result = $db->prepare('SELECT id, custom_url, redir_type FROM '.DB_PREFIX.'urls WHERE checksum=? AND url=? AND redir_type <> \'gone\' LIMIT 1');
 	$result->bindValue(1, (int)$checksum);
 	$result->bindValue(2, $url);
 	if ($result->execute())
@@ -94,37 +99,91 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		{
 			$id = $row['id'];
 		}
-		// create
+		// No redirection uses that URL yet
 		else
 		{
+			$redir_type = 'auto';
 			if(isset($_GET['custom_url']) && $_GET['custom_url'])
-			{
+			{ // user wants to assign short URL
 				$custom_url = $_GET['custom_url'];
-				// check if it exists
+				// check if the slug is already in use
 				$stmt = $db->prepare('SELECT * FROM '.DB_PREFIX.'urls WHERE custom_url = ?');
 				$stmt->bindValue(1, $custom_url);
 				$stmt->execute();
 				if($row = $stmt->fetch(PDO::FETCH_ASSOC))
 				{
-					$error = 'You already have a URL with that custom URL: '.$row['url'];
+					$error = 'The custom short URL you attempted to use (/'.$row['custom_url'].') is already in use, and is pointing to '.$row['url'];
 					include('pages/error.php');
 					exit;
 				}
+				else {
+					$redir_type = 'custom';
+					$slug = $custom_url;
+				}
 			}
-			else
-				$custom_url = "NULL";
-			$stmt = $db->prepare('INSERT INTO '.DB_PREFIX.'urls (url, checksum, custom_url) VALUES(?, ?, ?)');
+			else // auto-assign a slug
+			{
+				require_once 'library/BaseIntEncoder.php';
+				
+				$auto_assign_sql = 'SELECT base10 FROM '.DB_PREFIX.'autoslug '
+					.'WHERE method = :method LIMIT 1';
+				$auto = $db->prepare($auto_assign_sql);
+				$auto->execute('method'=>'base36');
+				$counter = $auto->fetch(PDO::FETCH_ASSOC);
+				$attempts = 0;
+				while ($slug === NULL) {
+					switch(AUTO_SLUG_METHOD) {
+						case 'base62':
+							$glyphs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+							$base = 62;
+							break;
+						case 'mixed-smart':
+							$glyphs = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+							// we excluded 6 characters: 0oO1Il
+							$base = 56;
+							break;
+						case 'base36':
+							$glyphs = '0123456789abcdefghijklmnopqrstuvwxyz';
+							$base = 36;
+							break;
+						case 'smart':
+							$glyphs = '23456789abcdefghijkmnpqrstuvwxyz';
+							$base = 32; //exclude 0o1l
+							break;
+						default:
+							throw new Exception ('Unsupported method to generate unique slugs!');
+							break;
+					}
+					//Handles big bases AND big number conversions!
+					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					$banned_pos = 
+					if()
+					if(okay to insert)
+					{
+						//Begin transaction
+						
+						//end transaction
+						break; // found a suitable URL
+					}
+					else
+					{
+						$slug = NULL;
+						$counter += pow($attempts++, 1.5);
+						continue;
+					}
+					
+				}
+			}
+			$stmt = $db->prepare('INSERT INTO '.DB_PREFIX.'urls (url, checksum, custom_url, redir_type) VALUES(?, ?, ?, ?)');
 			$stmt->bindValue(1, $url);
 			$stmt->bindValue(2, $checksum);
-			$stmt->bindValue(3, $custom_url);
+			$stmt->bindValue(3, $slug);
+			$stmt->bindValue(4, $redir_type);
 			$stmt->execute();
-			$id = $db->lastInsertId(DB_PREFIX."urls_id_seq");
 		}
 	}
-	if(isset($_GET['custom_url']) && $_GET['custom_url'])
-		$new_url = BCURLS_URL.$_GET['custom_url'];
-	else
-		$new_url = BCURLS_URL.base_convert($id, 10, 36);
+
+	$new_url = BCURLS_URL.$slug;
 	
 	if (isset($_GET['tweet']))
 	{
