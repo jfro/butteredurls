@@ -1,6 +1,7 @@
 <?php include('stubs/header.php'); ?>
 <p>
-	<input type="text" id="url" value="<?php echo htmlspecialchars($new_url); ?>" onclick="this.focus();this.select();" readonly="readonly" />
+	<!-- Using shortlink class. See http://ajh.us/k -->
+	<input type="text" id="url" class="shortlink" value="<?php echo htmlspecialchars($new_url); ?>" onclick="this.focus();this.select();" readonly="readonly" />
 	→ <strong><?php echo htmlspecialchars($url); ?></strong>
 </p>
 <p>

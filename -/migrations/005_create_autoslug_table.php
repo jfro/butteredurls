@@ -8,6 +8,9 @@ class Create_Autoslug_Table extends Migration
 {
 	function up()
 	{
+		Migrator::message('inform',
+		 	'This migration enables an efficient method of generating automatic slugs.'
+		);
 		$prefix = DB_PREFIX;
 		
 		$t = $this->createTable(DB_PREFIX.'autoslug');
