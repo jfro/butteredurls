@@ -18,9 +18,9 @@
 *	
 *	
 */
-include('config.php');
-include('db.php');
-include('stats.php');
+REQUIRE 'config.php';
+REQUIRE 'db.php';
+REQUIRE 'stats.php';
 
 define('BCURLS_VERSION',	'2.0.0');
 
@@ -247,7 +247,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		{
 			$slug = $existing_slug;
 		}
-			else
+		else // auto-assign a slug for this new URL.
 		{
 			$redir_type = 'auto';
 			if(isset($_GET['custom_url']) && $_GET['custom_url'])
@@ -272,10 +272,6 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			{
 				require_once 'library/BaseIntEncoder.php';
 				
-				$auto_assign_sql = 'SELECT base10 FROM '.DB_PREFIX.'autoslug '
-					.'WHERE method = :method LIMIT 1';
-				$auto = $db->prepare($auto_assign_sql);
-				$auto->execute('method'=>'base36');
 				switch(AUTO_SLUG_METHOD) {
 					case 'base62':
 						$glyphs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -298,7 +294,11 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 						throw new Exception ('Unsupported method to generate unique slugs!');
 						break;
 				}
-				$attempts = 0; //Keep track of when there is a collision
+				$attempts = 0; //Keep track of when there is
+				$auto_assign_sql = 'SELECT base10 FROM '.DB_PREFIX.'autoslug '
+					.'WHERE method = :method LIMIT 1';
+				$auto = $db->prepare($auto_assign_sql);
+				$auto->execute('method'=>'base36'); a collision
 				$counter = $auto->fetch(PDO::FETCH_ASSOC);
 				while ($slug === NULL) {
 					//Handles big bases AND big number conversions!
