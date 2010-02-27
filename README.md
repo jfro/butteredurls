@@ -1,5 +1,5 @@
-Lessn More 2.0
-==============
+Lessn More 2.0.0
+===============
 
 Homepage: <http://lessnmore.net>  
 Source/Fork: <http://github.com/alanhogan/lessmore>
@@ -29,10 +29,17 @@ Attention to detail:
 	upgrade or a switch of insertion algorithms is on the order of O(log(n)) where
 	<var>n</var> is the number of redirections in your database, and the common case is
 	on the order of O(1) (constant time).)
+*	Compliant with [URL shortener best practices and standards][bestp]
+	whenever possible
 
 An easy migration script will upgrade your database 
 from an existing Lessn migration.
 
+
+[markdn]:  http://bit.ly/mkdnsyntax   "This document is written in Markdown."
+[convert]: http://tinyurl.com/mkdnwmd "Markdown editor with instant HTML preview"
+
+[bestp]:   http://alanhogan.com/tips/rel-shortlink-for-short-urls "Everything you need to know about rel-shortlink and short URLs"
 
 Requirements
 -------------
@@ -42,14 +49,6 @@ Requirements
 * MySQL, PostgreSQL, or SQLite
 * mod_rewrite or similar rewrite system (see .htaccess)
 
-<!-- 
-  This document is written in Markdown,
-  readable as text or convertible to HTML.
-  Syntax: http://bit.ly/mkdnsyntax
-  Converter & cheatsheet: http://tinyurl.com/mkdndingus 
-  Editor w/ instant preview: http://tinyurl.com/mkdnwmd
-  (TextMate: ⌃⌥⌘-P to preview as web page)
--->
 
 History
 -------
@@ -106,9 +105,9 @@ Installation instructions are different depending on if you are upgrading or doi
 	automatically the first time you visit Lessn).
 
 **NOTE:** If your Lessn'd urls aren't working you probably didn't
-	upload the .htaccess file. Enable "Show invisible files" 
-	in your FTP application. It's also possible that your host doesn't like
-	the <IfModule>; try taking it out (this happens on 1and1).
+upload the .htaccess file. Enable "Show invisible files" 
+in your FTP application. It's also possible that your host doesn't like
+the <IfModule>; try taking it out (this happens on 1and1).
 
 ### Upgrading ###
 
@@ -120,8 +119,9 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
    checksum index type to INDEX (from UNIQUE).
 2.	Continue below with "ALL VERSIONS"
 
-#### ALL VERSIONS: Upgrading to ButteredURLs 2.0
+#### ALL VERSIONS: Upgrading to Lessn More 2.0
 
+1.	You are strongly encouraged to back up your database.
 1.	Note some old redirections so you can manually check they still work after upgrading (they should, but hey, it's important).
 1.	Manually merge your old configs into the new config file.
 	There will be new options you will want to make
