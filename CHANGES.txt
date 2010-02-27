@@ -8,6 +8,7 @@
 - Added migration script for butteredurls users
 - Custom slugs in bookmarklets
 - Prettied up installation
+- Allowed overwriting existing slugs (with a warning that this is bad for the Internet)
 
 1.1.1
 - Fix for #1

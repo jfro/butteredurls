@@ -5,16 +5,21 @@ include('-/db.php');
 
 $token = (isset($_GET['token']) ? $_GET['token'] : '');
 
-$show_stats = false;
-if(strrpos($token, '/stats')) //at end of url
-{
-	$show_stats = true;
-}
+$show_stats = (isset($_GET['stats']) OR strrpos($token, '/stats') !== false);
 if (RECORD_URL_STATS OR $show_stats) {
 	include('-/stats.php');
 }
 
-// redirect
+/*
+*	DEVELOPERS:
+*	Note the following possible redir_type values:
+*	-	'auto' - Automatically assigned slug. 301 redirect on access.
+*	-	'custom' - Manually set slug. 301 redirect on access.
+*	-	'alias' - Its 'url' is really just another slug. Do a recursive lookup to redirect on access.
+*	-	'gone' - Access results in a 410; should never change
+*/
+
+// Redirect lookup
 while($token != '') // Loop so we can handle aliases
 {
 	// Look up slug

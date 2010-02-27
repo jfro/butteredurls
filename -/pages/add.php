@@ -1,8 +1,17 @@
 <?php include('stubs/header.php'); ?>
+<?php if(isset($error) && strlen($error)) : ?>
+<p class="error"><?php echo htmlentities($error, ENT_QUOTES, 'UTF-8') ?></p>
+<?php endif; ?>
 <form method="get">
-	<input type="text" id="url" name="url" placeholder="url" />
+	<input type="text" id="url" name="url" placeholder="url" value="<?= htmlentities(@$_GET['url'], ENT_QUOTES, 'UTF-8')?>" />
 	<button>Shrink URL</button> <br />
-	<input type="text" name="custom_url" value="" placeholder="custom short url" /> (optional slug)
+	<input type="text" name="custom_url" value="<?= htmlentities(@$_GET['custom_url'], ENT_QUOTES, 'UTF-8')?>" id="custom_url" placeholder="custom short url" /> 
+	<label for="custom_url">(optional slug)</label> 
+	
+	<?php if(isset($error)): ?>
+		<br />
+		<input type="checkbox" name="overwrite" value="1" id="lm_overwrite" /> <label for="lm_overwrite">Overwrite existing slug <small><strong>(Bad for the Internet&trade;)</strong></small></label>
+	<?php endif; ?>
 	
 	<p>Grab the <a 
 		title="Shrink a link"

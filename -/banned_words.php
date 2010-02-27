@@ -36,6 +36,7 @@ $bcurls_banned_words = array (
 	'pussy',
 	'sh1t',
 	'shit',
+	'stats',
 	't1t',
 	'tit',
 	'tw4t',

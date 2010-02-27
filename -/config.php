@@ -54,4 +54,4 @@ define('GONE_410_URL', NULL); //e.g. 'http://example.com/gone'
 
 define('APP_NAME', 'Lessn More');
 
-define('LOG_MODE', TRUE); // Not recommended, slower and may require heightened permissions
+define('LOG_MODE', true); // Not recommended, slower and may require heightened permissions
