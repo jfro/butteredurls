@@ -164,6 +164,15 @@ function bcurls_update_slug ($url, $checksum, $slug, $redir_type)
 		return $stmt->errorCode().': '.$stmt->errorInfo();
 }
 
+/**
+* For debuggers, developers, and the curious
+*/
+function bc_log($message){
+	global $bc_log;
+	if(!is_string($bc_log)) $bc_log = '';
+	if(LOG_MODE) $bc_log .= date('r - ')."$message \n";
+}
+
 // new shortcut
 if (isset($_GET['url']) && !empty($_GET['url']))
 {
@@ -268,6 +277,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		$redir_type = 'auto';
 		require_once 'library/BaseIntEncoder.php';
 		
+		// PREPARE
 		switch(AUTO_SLUG_METHOD) {
 			case 'base62':
 				$glyphs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -290,55 +300,164 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 				throw new Exception ('Unsupported method to generate unique slugs!');
 				break;
 		}
-		$attempts = 0; //Keep track of when there is
+		$seek_count = 0; // When we need to skip tweets
+		$auto_seek_pow = 1.213;
+		$custom_seek_pow = 1.031; 
 		$auto_assign_sql = "SELECT base10 FROM {$prefix}autoslug "
 			.'WHERE method = :method LIMIT 1';
 		$auto = $db->prepare($auto_assign_sql);
 		$auto->execute(array('method'=>AUTO_SLUG_METHOD)); 
 		$counter = $auto->fetch(PDO::FETCH_ASSOC);
+		$counter = $counter['base10'];
+		
+		// For binary search //TODO
+		$high = 0;
+		$low = $counter;
+		
+		$total_attempts_remaining = 250;
+		
+		// Check to insert (seek)
 		while ($slug === NULL) {
-			//Handles big bases AND big number conversions!
-			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
-			// Check for banned words showing up
-			if(USE_BANNED_WORD_LIST){
-				$banned_pos = bcurls_find_banned_word($slug);
-				if($banned_pos !== FALSE) {
-					// If slug is e.g. BANNEDa
-					// we want to increment counter by (10 - a) in base $base
-					// to make the slug BANNEE0
-					// So we convert 1, 10, 100, etc. "in base $base" to base 10…
-					$rollover = BaseIntEncoder::decode((string)bcpow(10,$banned_pos), 
-						$glyphs, $base);
-					$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos-1), 
-						$glyphs, $base);
-					
-					$counter += ($rollover-$already_in);
-					$slug = NULL;
-					continue;
-				}	
+			// Never just try forever
+			if($total_attempts_remaining-- < 1) {
+				bc_log('Total attempts maxed out in insert loop');
+				$error = 'Tried too many times seeking an available slug';
+				include('pages/error.php');
+				exit;
 			}
-			if(true) //okay to insert //TODO
+			
+			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+			
+			// Check if slug is free
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE custom_url = :slug");
+			$stmt->execute(array('slug'=>$slug));
+			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+			if( ! $row ) //okay to insert //TODO
 			{
-				//Begin transaction
-				
-				//end transaction
 				break; // found a suitable URL
 			}
 			else
 			{
+				$oldcounter = $counter;
+				$counter += ceil(pow(++$seek_count, 
+					($row['redir_type'] == 'custom'
+						? $custom_seek_pow
+						: $auto_seek_pow
+					)
+				));
+				bc_log('Slug '.$slug.' already in use; its redir_type is '.$row['redir_type']
+					." - ".'Incremented counter from '.$oldcounter.' to '.$counter);
 				$slug = NULL;
-				$counter += BaseIntEncoder::bcCeil(bcpow($attempts++, 1.5));
 				continue;
 			}
 			
 		}
-	
-		$stmt = $db->prepare('INSERT INTO '.DB_PREFIX.'urls (url, checksum, custom_url, redir_type) VALUES(?, ?, ?, ?)');
-		$stmt->bindValue(1, $url);
-		$stmt->bindValue(2, $checksum);
-		$stmt->bindValue(3, $slug);
-		$stmt->bindValue(4, $redir_type);
-		$stmt->execute();
+		
+		// TODO Binary Search
+		
+		// (Carefully, loopingly) Insert!
+		while ($slug !== false){
+			// Never just try forever
+			if($total_attempts_remaining-- < 1) {
+				bc_log('Total attempts maxed out in insert loop');
+				$error = 'Tried too many times';
+				include('pages/error.php');
+				exit;
+			}
+			
+			if(USE_BANNED_WORD_LIST){
+				$banned_pos = bcurls_find_banned_word($slug);
+				if($banned_pos !== FALSE) {
+					if($banned_pos > 0) {
+						// If slug is e.g. BANNEDa
+						// we want to increment counter by (10 - a) in base $base
+						// to make the slug BANNEE0
+						// So we convert 1, 10, 100, etc. "in base $base" to base 10…
+						$rollover = BaseIntEncoder::decode((string)bcpow(10,$banned_pos), 
+							$glyphs, $base);
+						// and computure that a(base $base) = 11(base 10)
+						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos-1), 
+							$glyphs, $base);
+						// so (10 in base $base) in base 10 - 11 in base 10
+						$diff = $rollover-$already_in;
+						$counter += $diff;
+						if(LOG_MODE) bc_log('Counter += '.$diff.
+							' for banned word,  is now '.$counter.' - slug '.$slug);
+					} else {
+						$counter++;
+						if(LOG_MODE) bc_log('Counter++ for banned word, is now '
+							.$counter.' - slug '.$slug);
+					}
+					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					continue;
+				}	
+			}			
+			if(ADDITIONAL_HOMOGLYPHS_TO_AVOID){
+				$banned_pos = bcurls_find_banned_glyph($slug);
+				if($banned_pos !== FALSE) {
+					if($banned_pos > 0) {
+						$rollover = BaseIntEncoder::decode((string)bcpow(10,$banned_pos), 
+							$glyphs, $base);
+						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos-1), 
+							$glyphs, $base);
+						$diff = $rollover-$already_in;
+						$counter += $diff;
+						if(LOG_MODE) bc_log('Counter += '.$diff.
+							' for homoglyphs,  is now '.$counter.' - slug '.$slug);
+					} else {
+						$counter++;
+						if(LOG_MODE) bc_log('Counter++ for homoglyphs, is now '.$counter
+							.' - slug '.$slug);
+					}
+					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					continue;
+				}	
+			}
+			
+			// Actually insert 
+			try{
+				$insert_result = bcurls_insert_url ($url, $checksum, $slug, $redir_type);
+				if($insert_result !== true) {
+					bc_log('Insertion result (not true)'.(string)$insert_result);
+					$counter++;
+					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);	
+					continue;			
+				} 
+			} catch(Exception $e){
+				bc_log('Exception inserting or incrementing counter.'.$e);
+				$error = $e;
+				include('pages/error.php');
+				exit;
+			}
+			bc_log('About to increment counter');
+			// Update counter
+			try{
+				// Update counter 
+				// Note it would be great if this was a strictly incremental
+				// and atomic operation: "If your current base10 is smaller
+				// than mine, change it to mine, database!"
+				// This would deal with simultaneous inserts.
+				$counter_update_sql = "UPDATE {$prefix}autoslug 
+					SET base10 = :base10
+					WHERE method = :method LIMIT 1";
+				$ctr_up = $db->prepare($counter_update_sql);
+				$ctr_up_res = $ctr_up->execute(array(
+					'method' => AUTO_SLUG_METHOD, 
+					'base10' => bcadd((string)$counter,'1'
+				))); 
+				if(! $ctr_up_res) {
+					$error = 'Could not update the autoslug index (this will hurt insertion performance.) '
+						.$ctr_up->errorCode().': '.$ctr_up->errorInfo();
+					bc_log('Counter increment error. '.$error);
+				}
+			}
+			catch (Exception $e2) {
+				$error = (string) $e2;
+				bc_log('Could not update counter. '.$e2);
+			}
+			
+			break;
+		}
 	}
 	else 
 	{	// This is already in the DB, don't provide a new one

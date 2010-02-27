@@ -1,4 +1,4 @@
-<?php is_defined('OKAY_TO_SHOW_PAGES') OR DIE('Unauthenticated!');
+<?php defined('OKAY_TO_SHOW_PAGES') OR DIE('Unauthenticated!');
 
 if(isset($_GET['api']))
 	exit($error);
@@ -11,4 +11,8 @@ include('stubs/header.php'); ?>
 <p>
 	<a href="/-/">Back</a>
 </p>
+
+<?php if(isset($bc_log) && strlen($bc_log)) : ?>
+<p class="logs"><?php echo nl2br(htmlentities($bc_log, ENT_QUOTES, 'UTF-8')) ?></p>
+<?php endif; ?>
 <?php include('stubs/footer.php'); ?>

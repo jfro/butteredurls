@@ -95,10 +95,6 @@ Installation instructions are different depending on if you are upgrading or doi
 
 2. For the shortest URLs possible, upload the contents of this
 	directory to your domain's root public folder.
-	(For short urls when that is not possible, 
-	upload the entire directory to your server  
-	and rename to a single character or so. 
-	Example: http://doma.in/x/)
 
 3. Visit http://doma.in/-/ to log in & start using Lessn More!
 	Be sure to grab the bookmarklets. (The required database table is created 

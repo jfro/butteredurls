@@ -26,20 +26,20 @@ class BaseIntEncoder {
 	    return bcmul($c, 1, 0);
 	}
 
-	static private function bcFloor($x)
+	static function bcFloor($x)
 	{
 	    return bcmul($x, '1', 0);
 	}
 
-	static private function bcCeil($x)
+	static function bcCeil($x)
 	{
-	    $floor = bcFloor($x);
+	    $floor = self::bcFloor($x);
 	    return bcadd($floor, ceil(bcsub($x, $floor)));
 	}
 
-	static private function bcRound($x)
+	static function bcRound($x)
 	{
-	    $floor = bcFloor($x);
+	    $floor = self::bcFloor($x);
 	    return bcadd($floor, round(bcsub($x, $floor)));
 	}
 }

@@ -31,6 +31,10 @@
 <p>
 	<a href="?stats=1">URL Stats</a>
 </p>
+
+<?php if(isset($bc_log) && strlen($bc_log)) : ?>
+<p class="logs"><?php echo nl2br(htmlentities($bc_log, ENT_QUOTES, 'UTF-8')) ?></p>
+<?php endif; ?>
 <script>
 document.getElementById('url').focus();
 </script>

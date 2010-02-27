@@ -41,4 +41,10 @@ $bcurls_banned_words = array (
 	'tit',
 	'tw4t',
 	'twat',
+	'slob',
+	'dyke',
+	'puta',
+	'culo',
+	'fag',
+	'gay',
 );
