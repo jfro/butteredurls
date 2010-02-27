@@ -16,7 +16,7 @@ class Create_Autoslug_Table extends Migration
 		$t = $this->createTable(DB_PREFIX.'autoslug');
 		$t->column('id', 'serial', array('primary_key' => true, 'null' => false));
 		$t->column('method', 'string', array('null' => false, 'size' =>'31'));
-		$t->column('base10', 'bigint', array('default'=>0));
+		$t->column('base10', 'bigint', array('default'=>1));
 		$t->save();
 
 		$this->createIndex(DB_PREFIX.'autoslug', 'method', 'method_index', 'unique');
@@ -24,10 +24,10 @@ class Create_Autoslug_Table extends Migration
 		// Populate
 		$add_methods_sql = <<<EOSQL
 		INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-		VALUES (NULL ,  'base36',  '0'), 
-		(NULL ,  'base62',  '0'), 
-		(NULL ,  'mixed-smart',  '0'), 
-		(NULL ,  'lower-smart',  '0');		
+		VALUES (NULL ,  'base36',  1), 
+		(NULL ,  'base62',  1), 
+		(NULL ,  'mixed-smart',  1), 
+		(NULL ,  'lower-smart',  1);		
 EOSQL;
 		
 		$ins = $this->db->prepare($add_methods_sql);

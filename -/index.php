@@ -51,8 +51,8 @@ define('YEAR',		365 * 24 * 60 * 60);
 * returns 1
 */
 function bcurls_find_banned_word($slug) {
-	REQUIRE_ONCE 'banned_words.php';
 	global $bcurls_banned_words;
+	REQUIRE_ONCE 'banned_words.php';
 	foreach ($bcurls_banned_words as $banned){
 		$strpos = stripos($slug, $banned); 
 		if ($strpos !== false) {
@@ -199,6 +199,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		$existing_slug = $row['custom_url'];
 	} else {
 		$existing_slug = false;
+		$error = 'No existing slug'; //debug
 	}
 	
 	if(isset($_GET['custom_url']) && strlen(trim($_GET['custom_url'])))
@@ -262,7 +263,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			unset($updt_a);
 		}
 	}
-	elseif($existing_slug !== false) 
+	elseif($existing_slug == false) 
 	{	// auto-assign a slug for this new URL.
 		$redir_type = 'auto';
 		require_once 'library/BaseIntEncoder.php';
