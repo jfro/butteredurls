@@ -4,13 +4,13 @@ Lessn More 2.0.2
 Homepage: <http://lessnmore.net>  
 Source/Fork: <http://github.com/alanhogan/lessmore>
 
-Lessn More is a personal URL shortener.
+Lessn More is a free, open-source personal URL shortener.
 
 ### Features
 
 *	The ability to use custom short URLs (slugs), unlike Lessn
 *	A bookmarklet that even supports custom short URLs
-*	An API that supports the same commands as the web interface
+*	An [API][] that supports the same commands as the web interface
 *	Different auto-shorten modes (optional mixed case),
 *	The ability to avoid lookalike characters, and 
 *	An optional "banned word list" to prevent auto-generating offensive URLs.
@@ -50,6 +50,7 @@ Lessn More is a personal URL shortener.
 [bestp]:   http://alanhogan.com/tips/rel-shortlink-for-short-urls "Everything you need to know about rel-shortlink and short URLs"
 
 [issues]:  http://github.com/alanhogan/lessnmore/issues "Bugs & Issues on GitHub"
+[API]:     http://lessnmore.net/api "Lessn More API documentation"
 
 Requirements
 -------------
@@ -71,7 +72,7 @@ written by [Shaun Inman](http://shauninman.com/). It required PHP, MySQL, and mo
 ### v1.1
 
 Buttered URLs is a Lessn [fork](http://github.com/jfro/butteredurls) by [Jeremy Knope](http://buttered-cat.com/).
-Buttered URLs added logging, custom URLs, migration mechanism, and support for more database types.
+Buttered URLs added logging, custom URLs, a migration mechanism, and support for more database types.
 
 ### v2.0
 
@@ -133,7 +134,7 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 	There will be new options you will want to make
 	decisions about.
 1.	Upload all lessn/BU files, excluding config.php, or making sure to use the new one.
-1.	Go to http://doma.in/x/install.php?start=N where 
+1.	Go to http://doma.in/install.php?start=N where 
 	N is 2 if upgrading from Lessen 1.0, or    
 	N is 4 if upgrading from ButteredURLs 1.1.
 1.	Test some old known working redirections
@@ -141,6 +142,13 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 1.	Grab the new bookmarklets with custom short URL support!
 
 **Congratulations.** You are running the latest version of Lessn More.
+
+
+API
+---
+
+You can find [API documentation here][API].
+It's super simple.
 
 Issues
 -------
