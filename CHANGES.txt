@@ -1,11 +1,14 @@
 2.0 (Lessn More fork)
 - Protected against SQL injection attacks
-- Support for aliases - set the 'url' field to be the token you want to want to alias to, and the 'redir_type' to 'alias'
-- Support for the 410 GONE response for deleted redirections - set 'redir_type' to 'gone'
+- Support for aliases - set the 'url' field in a database row to be the token you want to want to alias to, and the 'redir_type' to 'alias'
+- Support for the 410 GONE response for deleted redirections - set 'redir_type' to 'gone' in the DB row
 - Avoids collisions between automatically assigned shortcuts and manual ones
 - Allows mixed-case shortcuts
 - Expanded README
 - Added migration script for butteredurls users
+- Custom slugs in bookmarklets
+- Prettied up installation
+- Allowed overwriting existing slugs (with a warning that this is bad for the Internet)
 
 1.1.1
 - Fix for #1
