@@ -24,7 +24,7 @@ while($token != '') // Loop so we can handle aliases
 {
 	// Look up slug
 	// TODO: Use PDO::prepare in "The other index.php"
-	$stmt = $db->prepare('SELECT * FROM '.DB_PREFIX.'urls WHERE custom_url = :slug LIMIT 1');
+	$stmt = $db->prepare('SELECT * FROM '.DB_PREFIX.'urls WHERE BINARY custom_url = BINARY :slug LIMIT 1');
 	$stmt->execute(array('slug'=>$token));
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 

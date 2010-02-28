@@ -1,12 +1,12 @@
-Lessn More 2.0.0
+Lessn More 2.0.1
 ===============
 
 Homepage: <http://lessnmore.net>  
 Source/Fork: <http://github.com/alanhogan/lessmore>
 
-Lessn More is a personal url shortener.
+Lessn More is a personal URL shortener.
 
-Features:
+### Features
 
 *	The ability to use custom short URLs (slugs), unlike Lessn
 *	A bookmarklet that even supports custom short URLs
@@ -17,7 +17,7 @@ Features:
 *	Support for more shortened URLs than Lessn
 *	The ability to add multiple slugs that point to the same long URL, unlike Lessn
 
-Attention to detail:
+#### Attention to detail
 
 *	Adding a new slug for a URL already in the database will become the "canonical"
 	short URL, and will be returned if you ask Lessn More (either by API or not)
@@ -32,15 +32,22 @@ Attention to detail:
 	on the order of O(1) (constant time).)
 *	Compliant with [URL shortener best practices and standards][bestp]
 	whenever possible
+*	An easy migration script will upgrade your database 
+	from an existing Lessn migration.
 
-An easy migration script will upgrade your database 
-from an existing Lessn migration.
+#### Caveats
 
+*	This shortener is not appropriate when there is a good chance that two or more URLs
+	will be shrunk at the same time. (Simultaneous reads are, of course, fine.)
+*	Lessn More 2.0 is a new release and has not been fully tested on databases 
+	other than MySQL. YMMV. Please [report any issues][issues].
 
 [markdn]:  http://bit.ly/mkdnsyntax   "This document is written in Markdown."
 [convert]: http://tinyurl.com/mkdnwmd "Markdown editor with instant HTML preview"
 
 [bestp]:   http://alanhogan.com/tips/rel-shortlink-for-short-urls "Everything you need to know about rel-shortlink and short URLs"
+
+[issues]:  http://github.com/alanhogan/lessnmore/issues "Bugs & Issues on GitHub"
 
 Requirements
 -------------
@@ -57,17 +64,17 @@ History
 ### v1.0
 
 Lessn was the original personal URL shortening service,
-written by Shaun Inman <http://shauninman.com/>. It required PHP, MySQL, and mod_rewrite.
+written by [Shaun Inman](http://shauninman.com/). It required PHP, MySQL, and mod_rewrite.
 
 ### v1.1
 
-Buttered URLs is a fork of Lessn by Jeremy Knope <http://github.com/jfro>.
+Buttered URLs is a Lessn [fork](http://github.com/jfro/butteredurls) by [Jeremy Knope](http://buttered-cat.com/).
 Buttered URLs added logging, custom URLs, migration mechanism, and support for more database types.
 
 ### v2.0
 
-Lessn More is a fork of Buttered URLs by Alan Hogan <http://github.com/alanhogan>.
-Lessn More increased the robustness and flexibility of the insertion algorithm,
+Lessn More is a Buttered URLs [fork](http://github.com/alanhogan/lessnmore) by [Alan Hogan](http://alanhogan.com/).
+Lessn More increased the robustness of the insertion algorithm,
 prevented slug conflicts, updated the bookmarklets, added multiple auto-shorten modes,
 banned word lists, and enhanced security.
 
@@ -132,3 +139,8 @@ If you are upgrading from a previous version of Lessn or ButteredURLs:
 1.	Grab the new bookmarklets with custom short URL support!
 
 **Congratulations.** You are running the latest version of Lessn More.
+
+Issues
+-------
+
+To report an issue or check known issues, visit [the Lessn More issue tracker on GitHub][issues].

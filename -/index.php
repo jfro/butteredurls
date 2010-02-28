@@ -27,7 +27,7 @@ REQUIRE 'config.php';
 REQUIRE 'db.php';
 REQUIRE 'stats.php';
 
-define('BCURLS_VERSION',	'2.0.0');
+define('BCURLS_VERSION',	'2.0.1');
 
 define('BCURLS_DOMAIN', 	preg_replace('#^www\.#', '', $_SERVER['SERVER_NAME']));
 define('BCURLS_URL', 	str_replace('-/index.php', '', 'http://'.BCURLS_DOMAIN.$_SERVER['PHP_SELF']));
@@ -192,7 +192,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 
 	// Is there already a row in the DB going to this same URL?
 	$checksum 		= (int) sprintf('%u', crc32($url));
-	$result = $db->prepare("SELECT id, custom_url, redir_type FROM {$prefix}urls WHERE checksum=? AND url=? AND redir_type <> 'gone' ORDER BY redir_type DESC LIMIT 1"); //sort so custom is before auto.
+	$result = $db->prepare("SELECT id, custom_url, redir_type FROM {$prefix}urls WHERE checksum=? AND BINARY url = BINARY ? AND redir_type <> 'gone' ORDER BY redir_type DESC LIMIT 1"); //sort so custom is before auto.
 	$result->bindValue(1, (int)$checksum);
 	$result->bindValue(2, $url);
 	if ( ! $result->execute())
@@ -215,7 +215,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 	{	// user wants to assign a custom short URL
 		$custom_url = trim($_GET['custom_url']);
 		// check if the slug is already in use
-		$stmt = $db->prepare("SELECT * FROM {$prefix}urls WHERE custom_url = ?");
+		$stmt = $db->prepare("SELECT * FROM {$prefix}urls WHERE BINARY custom_url = BINARY ?");
 		$stmt->bindValue(1, $custom_url);
 		$stmt->execute();
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -261,7 +261,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		{
 			// User added a new custom short URL even though that URL is already in the DB
 			// Update old redirections so they are no more than aliases of the new one ;)
-			$update_to_alias_sql = "UPDATE {$prefix}urls SET redir_type = 'alias', url = :slug, checksum = :newchecksum WHERE checksum = :checksum AND url = :url AND (redir_type = 'custom' OR redir_type = 'auto') AND custom_url <> :slug";
+			$update_to_alias_sql = "UPDATE {$prefix}urls SET redir_type = 'alias', url = :slug, checksum = :newchecksum WHERE checksum = :checksum AND url = :url AND (redir_type = 'custom' OR redir_type = 'auto') AND BINARY custom_url <> BINARY :slug";
 			$updt_a = $db->prepare($update_to_alias_sql);
 			$updt_a->execute(array(
 				'checksum'		=> $checksum,
@@ -328,7 +328,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
 			
 			// Check if slug is free
-			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE custom_url = :slug");
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
 			$stmt->execute(array('slug'=>$slug));
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 			if( ! $row ) //okay to insert 
@@ -355,7 +355,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		
 		
 		// Binary Search
-		if(LOG_MODE) bc_log("Before binary search: low: $low; high: $high; counter: $counter");
+		if(LOG_MODE) bc_log("Before binary search: low: $low; high: $high; slug: $slug");
 		// Note: Low is always "known bad" and high is always "known good"
 		$high = (string)$high;
 		$low = (string)$low;
@@ -365,13 +365,13 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			{
 				$counter = $high;
 				$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
-				if(LOG_MODE) bc_log('Binary search decided to use '.$counter." because high == low+1");
+				if(LOG_MODE) bc_log('Binary search decided to use '.$slug.' (counter '.$counter.") because high == low+1");
 				break;
 			}
 			
 			$counter = bcadd($low, bcmul(bcsub($high, $low), '0.5', 0)); // at least +1
 			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
-			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE custom_url = :slug");
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
 			$stmt->execute(array('slug'=>$slug));
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 			if( ! $row ) // empty spot in the DB!
@@ -390,6 +390,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		
 		
 		$total_attempts_remaining += 50;
+		$validated = true;
 		// (Carefully, loopingly) Insert!
 		while ($slug !== false){
 			// Never just try forever
@@ -398,6 +399,18 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 				$error = 'Tried too many times';
 				include('pages/error.php');
 				exit;
+			}
+			
+			if( ! $validated){
+				$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
+				$stmt->execute(array('slug'=>$slug));
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
+				if($row) 
+				{
+					$counter = bcadd($counter, '1');
+					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					continue;
+				}
 			}
 			
 			if(USE_BANNED_WORD_LIST){
@@ -419,11 +432,12 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 						if(LOG_MODE) bc_log('Counter += '.$diff.
 							' for banned word,  is now '.$counter.' - slug '.$slug);
 					} else {
-						$counter++;
+						$counter = bcadd($counter, '1');
 						if(LOG_MODE) bc_log('Counter++ for banned word, is now '
 							.$counter.' - slug '.$slug);
 					}
 					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					$validated = false;
 					continue;
 				}	
 			}			
@@ -440,11 +454,12 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 						if(LOG_MODE) bc_log('Counter += '.$diff.
 							' for homoglyphs,  is now '.$counter.' - slug '.$slug);
 					} else {
-						$counter++;
+						$counter = bcadd($counter, '1');
 						if(LOG_MODE) bc_log('Counter++ for homoglyphs, is now '.$counter
 							.' - slug '.$slug);
 					}
 					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+					$validated = false;
 					continue;
 				}	
 			}
@@ -454,8 +469,9 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 				$insert_result = bcurls_insert_url ($url, $checksum, $slug, $redir_type);
 				if($insert_result !== true) {
 					bc_log('Insertion result (not true)'.(string)$insert_result);
-					$counter++;
+					$counter = bcadd($counter, '1');
 					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);	
+					$validated = false;
 					continue;			
 				} 
 			} catch(Exception $e){

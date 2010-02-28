@@ -1,3 +1,6 @@
+2.0.1
+- Case sensitivity in MySQL
+
 2.0 (Lessn More fork)
 - Protected against SQL injection attacks
 - Support for aliases - set the 'url' field in a database row to be the token you want to want to alias to, and the 'redir_type' to 'alias'
