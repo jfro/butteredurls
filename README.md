@@ -84,7 +84,7 @@ Legal
 
 Lessn is offered as-is, sans support and without warranty.
 Copyright © 2009-10 Shaun Inman and contributors.
-
+Offered under a BSD-like license; see license.txt.
 
 Installation
 ------------
