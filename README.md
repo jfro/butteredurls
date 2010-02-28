@@ -1,5 +1,5 @@
-Lessn More 2.0.2
-===============
+Lessn More 2.0.3
+================
 
 Homepage: <http://lessnmore.net>  
 Source/Fork: <http://github.com/alanhogan/lessmore>
