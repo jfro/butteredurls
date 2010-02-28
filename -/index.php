@@ -208,7 +208,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		$existing_slug = $row['custom_url'];
 	} else {
 		$existing_slug = false;
-		$error = 'No existing slug'; //debug
+		if(LOG_MODE) bc_log('No existing slug'); //debug
 	}
 	
 	if(isset($_GET['custom_url']) && strlen(trim($_GET['custom_url'])))
@@ -311,8 +311,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		$counter = $counter['base10'];
 		
 		// For binary search //TODO
-		$high = 0;
-		$low = $counter;
+		$high = $low = $counter;
 		
 		$total_attempts_remaining = 250;
 		
@@ -332,29 +331,65 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE custom_url = :slug");
 			$stmt->execute(array('slug'=>$slug));
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
-			if( ! $row ) //okay to insert //TODO
+			if( ! $row ) //okay to insert 
 			{
+				$high = $counter;
 				break; // found a suitable URL
 			}
 			else
 			{
-				$oldcounter = $counter;
+				$low = $counter;
 				$counter += ceil(pow(++$seek_count, 
 					($row['redir_type'] == 'custom'
 						? $custom_seek_pow
 						: $auto_seek_pow
 					)
 				));
-				bc_log('Slug '.$slug.' already in use; its redir_type is '.$row['redir_type']
-					." - ".'Incremented counter from '.$oldcounter.' to '.$counter);
+				if(LOG_MODE) bc_log('Slug '.$slug.' already in use; its redir_type is '.$row['redir_type']
+					." - ".'Incremented counter from '.$low.' to '.$counter);
 				$slug = NULL;
 				continue;
 			}
 			
 		}
 		
-		// TODO Binary Search
 		
+		// Binary Search
+		if(LOG_MODE) bc_log("Before binary search: low: $low; high: $high; counter: $counter");
+		// Note: Low is always "known bad" and high is always "known good"
+		$high = (string)$high;
+		$low = (string)$low;
+		while($low != $high)
+		{
+			if($high == bcadd((string)$low,'1'))
+			{
+				$counter = $high;
+				$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+				if(LOG_MODE) bc_log('Binary search decided to use '.$counter." because high == low+1");
+				break;
+			}
+			
+			$counter = bcadd($low, bcmul(bcsub($high, $low), '0.5', 0)); // at least +1
+			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE custom_url = :slug");
+			$stmt->execute(array('slug'=>$slug));
+			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+			if( ! $row ) // empty spot in the DB!
+			{
+				$high = $counter;
+				if(LOG_MODE) bc_log($slug.' was available (counter: '.$counter.')');
+
+			}
+			else
+			{
+				$low = $counter;
+				if(LOG_MODE) bc_log($slug.' was occupied (counter: '.$counter.')');
+			}
+			
+		}
+		
+		
+		$total_attempts_remaining += 50;
 		// (Carefully, loopingly) Insert!
 		while ($slug !== false){
 			// Never just try forever
