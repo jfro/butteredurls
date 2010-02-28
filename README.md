@@ -1,4 +1,4 @@
-Lessn More 2.0.1
+Lessn More 2.0.2
 ===============
 
 Homepage: <http://lessnmore.net>  
@@ -41,6 +41,8 @@ Lessn More is a personal URL shortener.
 	will be shrunk at the same time. (Simultaneous reads are, of course, fine.)
 *	Lessn More 2.0 is a new release and has not been fully tested on databases 
 	other than MySQL. YMMV. Please [report any issues][issues].
+*	Changing settings such as the allowed character set, while a supported use case,
+	should be done seldom, and with deliberation.
 
 [markdn]:  http://bit.ly/mkdnsyntax   "This document is written in Markdown."
 [convert]: http://tinyurl.com/mkdnwmd "Markdown editor with instant HTML preview"

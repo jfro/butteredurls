@@ -1,3 +1,7 @@
+2.0.2
+- Optimize a couple queries
+- Fix for finding banned words and glyphs anywhere but the end of the slug
+
 2.0.1
 - Case sensitivity in MySQL
 

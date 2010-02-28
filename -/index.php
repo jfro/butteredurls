@@ -56,6 +56,7 @@ function bcurls_find_banned_word($slug) {
 	foreach ($bcurls_banned_words as $banned){
 		$strpos = stripos($slug, $banned); 
 		if ($strpos !== false) {
+			bc_log('Found banned word '.$banned.' in '.$slug);
 			// $slug = xBANNEDxx (length 9)
 			// $banned = BANNED (length 6)
 			// strpos = 1
@@ -77,11 +78,12 @@ function bcurls_find_banned_glyph($slug) {
 	foreach ($glyphs as $banned){
 		$strpos = strpos($slug, $banned); 
 		if ($strpos !== FALSE) {
+			bc_log('Found banned glyph '.$banned.' in '.$slug);
 			// $slug = xIxx (length 4)
 			// $banned = I (length I)
 			// strpos = 1
 			// we want to return 2 (I is two characters from the right)
-			return strlen($slug) - 1 - $strpos;
+			return (strlen($slug) - 1 - $strpos);
 		}
 	}
 	return FALSE; 
@@ -192,9 +194,10 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 
 	// Is there already a row in the DB going to this same URL?
 	$checksum 		= (int) sprintf('%u', crc32($url));
-	$result = $db->prepare("SELECT id, custom_url, redir_type FROM {$prefix}urls WHERE checksum=? AND BINARY url = BINARY ? AND redir_type <> 'gone' ORDER BY redir_type DESC LIMIT 1"); //sort so custom is before auto.
+	$result = $db->prepare("SELECT id, custom_url, redir_type FROM {$prefix}urls WHERE checksum=? AND BINARY url = BINARY ? AND url = ? AND redir_type <> 'gone' ORDER BY redir_type DESC LIMIT 1"); //sort so custom is before auto.
 	$result->bindValue(1, (int)$checksum);
 	$result->bindValue(2, $url);
+	$result->bindValue(3, $url);
 	if ( ! $result->execute())
 	{
 		$error = 'Problem executing query to check if the URL is already in the DB! '
@@ -215,13 +218,14 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 	{	// user wants to assign a custom short URL
 		$custom_url = trim($_GET['custom_url']);
 		// check if the slug is already in use
-		$stmt = $db->prepare("SELECT * FROM {$prefix}urls WHERE BINARY custom_url = BINARY ?");
+		$stmt = $db->prepare("SELECT * FROM {$prefix}urls WHERE BINARY custom_url = BINARY ? AND  custom_url =  ?");
 		$stmt->bindValue(1, $custom_url);
+		$stmt->bindValue(2, $custom_url);
 		$stmt->execute();
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 		if($row && ! isset($_GET['overwrite']))
 		{
-			$error = 'The custom short URL you attempted to use (/'.$row['custom_url'].') is already in use, and is pointing to '.$row['url'];
+			$error = 'The custom short URL you attempted to use (/'.$row['custom_url'].') is already in use, and is '.($row['redir_type'] == 'alias' ? 'an alias for /': 'pointing to ').$row['url'];
 			if(isset($_GET['api'])) exit('Error: Token in use');
 			else 
 			{
@@ -261,7 +265,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 		{
 			// User added a new custom short URL even though that URL is already in the DB
 			// Update old redirections so they are no more than aliases of the new one ;)
-			$update_to_alias_sql = "UPDATE {$prefix}urls SET redir_type = 'alias', url = :slug, checksum = :newchecksum WHERE checksum = :checksum AND url = :url AND (redir_type = 'custom' OR redir_type = 'auto') AND BINARY custom_url <> BINARY :slug";
+			$update_to_alias_sql = "UPDATE {$prefix}urls SET redir_type = 'alias', url = :slug, checksum = :newchecksum WHERE checksum = :checksum AND url = :url AND BINARY url = BINARY :url AND (redir_type = 'custom' OR redir_type = 'auto') AND BINARY custom_url <> BINARY :slug";
 			$updt_a = $db->prepare($update_to_alias_sql);
 			$updt_a->execute(array(
 				'checksum'		=> $checksum,
@@ -328,7 +332,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
 			
 			// Check if slug is free
-			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug AND custom_url = :slug");
 			$stmt->execute(array('slug'=>$slug));
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 			if( ! $row ) //okay to insert 
@@ -371,7 +375,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			
 			$counter = bcadd($low, bcmul(bcsub($high, $low), '0.5', 0)); // at least +1
 			$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
-			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
+			$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE  custom_url = :slug AND BINARY custom_url = BINARY :slug");
 			$stmt->execute(array('slug'=>$slug));
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 			if( ! $row ) // empty spot in the DB!
@@ -402,7 +406,7 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			}
 			
 			if( ! $validated){
-				$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE BINARY custom_url = BINARY :slug");
+				$stmt = $db->prepare("SELECT custom_url, redir_type FROM {$prefix}urls WHERE  custom_url = :slug AND BINARY custom_url = BINARY :slug");
 				$stmt->execute(array('slug'=>$slug));
 				$row = $stmt->fetch(PDO::FETCH_ASSOC);
 				if($row) 
@@ -420,21 +424,21 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 						// If slug is e.g. BANNEDa
 						// we want to increment counter by (10 - a) in base $base
 						// to make the slug BANNEE0
-						// So we convert 1, 10, 100, etc. "in base $base" to base 10…
-						$rollover = BaseIntEncoder::decode((string)bcpow(10,$banned_pos), 
-							$glyphs, $base);
+						$rollover = bcpow((string)$base, (string)$banned_pos);
+						bc_log('Rollover calculated: '.$rollover);
 						// and computure that a(base $base) = 11(base 10)
-						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos-1), 
+						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos), 
 							$glyphs, $base);
+						bc_log('Already_in calculated: '.$already_in.' based on "'.substr($slug, 0-$banned_pos).'"');
 						// so (10 in base $base) in base 10 - 11 in base 10
-						$diff = $rollover-$already_in;
-						$counter += $diff;
+						$diff = bcsub($rollover,$already_in);
+						$counter = bcadd($counter, $diff);
 						if(LOG_MODE) bc_log('Counter += '.$diff.
 							' for banned word,  is now '.$counter.' - slug '.$slug);
 					} else {
 						$counter = bcadd($counter, '1');
-						if(LOG_MODE) bc_log('Counter++ for banned word, is now '
-							.$counter.' - slug '.$slug);
+						if(LOG_MODE) bc_log('Counter++ for banned word in slug '.$slug
+							.', counter is now '.$counter);
 					}
 					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
 					$validated = false;
@@ -445,18 +449,19 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 				$banned_pos = bcurls_find_banned_glyph($slug);
 				if($banned_pos !== FALSE) {
 					if($banned_pos > 0) {
-						$rollover = BaseIntEncoder::decode((string)bcpow(10,$banned_pos), 
+						$rollover = bcpow((string)$base, (string)$banned_pos);
+						bc_log('Rollover calculated: '.$rollover);
+						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos), 
 							$glyphs, $base);
-						$already_in = BaseIntEncoder::decode(substr($slug, 0-$banned_pos-1), 
-							$glyphs, $base);
-						$diff = $rollover-$already_in;
-						$counter += $diff;
+						bc_log('Already_in calculated: '.$already_in.' based on "'.substr($slug, 0-$banned_pos).'"');
+						$diff = bcsub($rollover,$already_in);
+						$counter = bcadd($counter, $diff);
 						if(LOG_MODE) bc_log('Counter += '.$diff.
 							' for homoglyphs,  is now '.$counter.' - slug '.$slug);
 					} else {
 						$counter = bcadd($counter, '1');
-						if(LOG_MODE) bc_log('Counter++ for homoglyphs, is now '.$counter
-							.' - slug '.$slug);
+						if(LOG_MODE) bc_log('Counter++ for homoglyph in slug '.$slug
+							.', counter is now '.$counter);
 					}
 					$slug = BaseIntEncoder::encode($counter, $glyphs, $base);
 					$validated = false;
@@ -509,6 +514,8 @@ if (isset($_GET['url']) && !empty($_GET['url']))
 			
 			break;
 		}
+		
+		if(LOG_MODE) bc_log('$total_attempts_remaining after finish: '.$total_attempts_remaining);
 	}
 	else 
 	{	// This is already in the DB, don't provide a new one
