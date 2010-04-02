@@ -22,19 +22,32 @@ class Create_Autoslug_Table extends Migration
 		$this->createIndex(DB_PREFIX.'autoslug', 'method', 'method_index', 'unique');
 		
 		// Populate
-		$add_methods_sql = <<<EOSQL
-		INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-		VALUES (NULL ,  'base36',  '1'), 
-		(NULL ,  'base62',  '1'), 
-		(NULL ,  'mixed-smart',  '1'), 
-		(NULL ,  'smart',  '1');		
+		// SQLite/PostgreSQL don't support compound(?) inserts.
+		// migration could possibly provide an insert function
+		$add_methods_sql = array();
+		$add_methods_sql[] = <<<EOSQL
+INSERT INTO  ${prefix}autoslug (id ,method ,base10)
+VALUES (NULL ,  'base36',  '1');
 EOSQL;
-		
-		$ins = $this->db->prepare($add_methods_sql);
-		if( ! $ins->execute()){
-			throw new Exception('Failed to add rows for autoslug methods.');
+		$add_methods_sql[] = <<<EOSQL
+INSERT INTO  ${prefix}autoslug (id ,method ,base10)
+VALUES (NULL ,  'base62',  '1');
+EOSQL;
+		$add_methods_sql[] = <<<EOSQL
+INSERT INTO  ${prefix}autoslug (id ,method ,base10)
+VALUES (NULL ,  'mixed-smart',  '1');
+EOSQL;
+		$add_methods_sql[] = <<<EOSQL
+INSERT INTO  ${prefix}autoslug (id ,method ,base10)
+VALUES (NULL ,  'smart',  '1');
+EOSQL;
+		foreach($add_methods_sql as $sql)
+		{
+			$ins = $this->db->prepare($sql);
+			if( ! $ins->execute()){
+				throw new Exception('Failed to add rows for autoslug methods.');
+			}
 		}
-
 	}
 	
 	function down()

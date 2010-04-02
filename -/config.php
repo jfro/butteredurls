@@ -9,7 +9,7 @@ define('DB_NAME', 		'lessn');
 define('DB_USERNAME', 	'lessn');
 define('DB_PASSWORD', 	'pass');
 define('DB_PREFIX', 	'lessn_'); // Lessn More can share a database by prefixing table names
-define('DB_DRIVER',		'mysql'); // mysql or pgsql, sqlite could be done with maybe tweaks
+define('DB_DRIVER',		'mysql'); // mysql, pgsql, sqlite (sqlite not fully tested)
 define('DB_SERVER', 	'localhost'); // You may able to leave as-is
 
 // Enable statistics?

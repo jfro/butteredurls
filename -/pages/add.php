@@ -3,9 +3,9 @@
 <p class="error"><?php echo htmlentities($error, ENT_QUOTES, 'UTF-8') ?></p>
 <?php endif; ?>
 <form method="get">
-	<input type="text" id="url" name="url" placeholder="url" value="<?= htmlentities(@$_GET['url'], ENT_QUOTES, 'UTF-8')?>" />
+	<input type="text" id="url" name="url" placeholder="url" value="<?php echo htmlentities(@$_GET['url'], ENT_QUOTES, 'UTF-8')?>" />
 	<button>Shrink URL</button> <br />
-	<input type="text" name="custom_url" value="<?= htmlentities(@$_GET['custom_url'], ENT_QUOTES, 'UTF-8')?>" id="custom_url" placeholder="custom short url" /> 
+	<input type="text" name="custom_url" value="<?php echo htmlentities(@$_GET['custom_url'], ENT_QUOTES, 'UTF-8')?>" id="custom_url" placeholder="custom short url" /> 
 	<label for="custom_url">(optional slug)</label> 
 	
 	<?php if(isset($error)): ?>
