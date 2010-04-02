@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<title>Lessn</title>
-<meta name="generator" content="ButteredURLs <?php echo BCURLS_VERSION;?>" /> 
+<title><?php echo htmlentities(APP_NAME) ?></title>
+<meta name="generator" content="<?php echo htmlentities(APP_NAME .' '. BCURLS_VERSION);?>" /> 
 <style>
 body
 {

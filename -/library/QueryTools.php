@@ -6,7 +6,7 @@ class QueryTools_Table
 	protected $fields = array();
 	protected $constraints = array();
 	
-	function __construct($qt, $name)
+	function __construct(&$qt, $name)
 	{
 		$this->qt = $qt;
 		$this->name = $name;
@@ -45,7 +45,8 @@ class QueryTools_Table
 			$out = 'CONSTRAINT '.$name.' PRIMARY KEY ('.$fields.')';
 		}
 		$this->constraints[] = $out;
-	}
+	}	
+	
 	
 	function column($name, $type, $options=null)
 	{
@@ -86,7 +87,7 @@ class QueryTools
 	protected $type = null;
 	protected $db = null;
 
-	function __construct($db, $dbType=null)
+	function __construct(&$db, $dbType=null)
 	{
 		$this->db = $db;
 		if($dbType === null)
