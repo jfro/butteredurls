@@ -52,7 +52,7 @@ define('ERROR_404_URL', NULL); //e.g. 'http://example.com/404'
 // If an slug was deleted (marked 'gone')
 define('GONE_410_URL', NULL); //e.g. 'http://example.com/gone'
 
-define('APP_NAME', 'Lessn More');
+define('APP_NAME', 'ButteredURLs');
 
 // For debuggers, developers, and the curious
 define('LOG_MODE', false); // Not recommended, a bit slower.

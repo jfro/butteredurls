@@ -26,6 +26,11 @@ abstract class Migration
 		$this->qt->createIndex($table, $fields, $name, $unique);
 	}
 	
+	function addColumn($table, $column, $type, $options=null)
+	{
+		$this->qt->addColumn($table, $column, $type, $options);
+	}
+	
 	function __call($method, $args)
 	{
 		return call_user_func_array(array($this->qt, $method), $args);

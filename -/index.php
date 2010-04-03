@@ -52,7 +52,7 @@ define('YEAR',		365 * 24 * 60 * 60);
 */
 function bcurls_find_banned_word($slug) {
 	global $bcurls_banned_words;
-	REQUIRE_ONCE 'banned_words.php';
+	require_once 'banned_words.php';
 	foreach ($bcurls_banned_words as $banned){
 		$strpos = stripos($slug, $banned); 
 		if ($strpos !== false) {
