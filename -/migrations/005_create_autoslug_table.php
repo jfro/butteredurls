@@ -26,20 +26,20 @@ class Create_Autoslug_Table extends Migration
 		// migration could possibly provide an insert function
 		$add_methods_sql = array();
 		$add_methods_sql[] = <<<EOSQL
-INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-VALUES (NULL ,  'base36',  '1');
+INSERT INTO  ${prefix}autoslug (method ,base10)
+VALUES ('base36',  '1');
 EOSQL;
 		$add_methods_sql[] = <<<EOSQL
-INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-VALUES (NULL ,  'base62',  '1');
+INSERT INTO  ${prefix}autoslug (method ,base10)
+VALUES ('base62',  '1');
 EOSQL;
 		$add_methods_sql[] = <<<EOSQL
-INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-VALUES (NULL ,  'mixed-smart',  '1');
+INSERT INTO  ${prefix}autoslug (method ,base10)
+VALUES ('mixed-smart',  '1');
 EOSQL;
 		$add_methods_sql[] = <<<EOSQL
-INSERT INTO  ${prefix}autoslug (id ,method ,base10)
-VALUES (NULL ,  'smart',  '1');
+INSERT INTO  ${prefix}autoslug (method ,base10)
+VALUES ('smart',  '1');
 EOSQL;
 		foreach($add_methods_sql as $sql)
 		{
